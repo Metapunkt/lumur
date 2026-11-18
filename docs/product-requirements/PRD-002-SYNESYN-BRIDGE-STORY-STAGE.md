@@ -238,10 +238,18 @@ tab, Story Catalyst, Story Stage). This PRD does not duplicate them.
   through a Lumur `StoryStageHost`, mapping stage layers to surface roles:
   backdrop, character / portrait / clip, and ambience. Mapping is by role
   name, not by hard-coded projector UV.
+  **Status (slice 3):** complete-in-sim — `LumurStoryStageHost` +
+  `LumurStoryStageLayout` / projector in `addons/lumur_synesyn/`; Python
+  `story_stage_*` layout/compose/project with stub source. Live
+  `story_stage` is observed non-invasively when present; headless uses the
+  stub. See [story-stage.md](../bridge/story-stage.md).
 - **REQ-002-010:** Story Stage scenario sections that Lumur does not
   understand must be ignored without breaking projection. Scenarios with
   no new sections behave as Synesyn’s compatibility contract requires
   (authored loops, no forced slideshow / lull).
+  **Status (slice 3):** complete-in-sim — layout reader only accepts
+  `lumur_layout` / `lumur_story_stage` / `lumur_surfaces`; other sections
+  ignored; defaults match authored-loop behaviour.
 
 ### Audience steering (opt-in)
 
@@ -291,11 +299,13 @@ tab, Story Catalyst, Story Stage). This PRD does not duplicate them.
   xvfb), using a ComfyUI stub for standalone generation and a Synesyn Hub
   mock for bridge behaviour. Physical hardware validation is explicitly
   deferred.
-  **Status (slice 2):** complete-in-sim for REQs 001–008, 014 (room
+  **Status (slice 3):** complete-in-sim for REQs 001–010, 014 (room
   registration) —
   `companion/tests/test_generate_comfyui.py` +
-  `companion/tests/test_generate_synesyn_hub.py` (mock Hub). Story Stage /
-  steering / Story Log replay remain later slices.
+  `companion/tests/test_generate_synesyn_hub.py` (mock Hub) +
+  `companion/tests/test_story_stage_surfaces.py` (stub Story Stage →
+  layout → paint → sim). Audience steering / Story Log replay remain
+  slice 4.
 
 ## Acceptance
 
@@ -310,7 +320,8 @@ Automated (target, as slices land):
   `SynesynRenderRequestV1` submit shape, `input_uploads`, artifact →
   surface mapping, provenance fields retained (REQ-002-006–008).
 - Story Stage layer → surface role mapping in sim; unknown scenario
-  sections ignored (REQ-002-009–010).
+  sections ignored (REQ-002-009–010) —
+  `companion/tests/test_story_stage_surfaces.py` (stub source).
 - Steering off by default; with `[LUMUR_AUDIENCE]` (or agreed name),
   injected zone/gathering events affect a test host; without it, they do
   not (REQ-002-011–013).
@@ -405,8 +416,11 @@ Synesyn code change is required**; Lumur adapts at the bridge boundary.
 - Architectural decision: ADR 0008, 0009, 0015, 0016
 - Implementation tracker: slice 1 in companion `lumur.generate` +
   `addons/lumur` paint texture path; slice 2 in `lumur_synesyn` +
-  `addons/lumur_synesyn` ([bridge/synesyn.md](../bridge/synesyn.md))
+  `addons/lumur_synesyn` ([bridge/synesyn.md](../bridge/synesyn.md));
+  slice 3 Story Stage layout
+  ([bridge/story-stage.md](../bridge/story-stage.md))
 - Executable specification: `companion/tests/test_generate_comfyui.py`
   (slice 1); `companion/tests/test_generate_synesyn_hub.py` (slice 2 Hub
-  mock); further Godot headless tests per later slices
+  mock); `companion/tests/test_story_stage_surfaces.py` (slice 3 stub →
+  paint → sim)
 - Founding notes: [scratchpad](../scratchpad.md)

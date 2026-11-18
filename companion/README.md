@@ -85,6 +85,16 @@ Separate package `lumur_synesyn` + Godot addon `addons/lumur_synesyn/`.
 Core Lumur is unchanged without it. See
 [docs/bridge/synesyn.md](../docs/bridge/synesyn.md).
 
+## Story Stage → surfaces (slice 3)
+
+Stub / layout / paint projection (no live Synesyn required):
+
+```bash
+pytest tests/test_story_stage_surfaces.py
+```
+
+See [docs/bridge/story-stage.md](../docs/bridge/story-stage.md).
+
 ## Live calibration and scan
 
 See [docs/companion/calibration.md](../docs/companion/calibration.md) and
