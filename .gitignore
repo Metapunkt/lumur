@@ -1,0 +1,18 @@
+# Godot 4
+.godot/
+*.translation
+export_presets.cfg
+
+# Python companion
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+*.egg-info/
+
+# Editors and OS
+.DS_Store
+Thumbs.db
+*~
+*.swp
