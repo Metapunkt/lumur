@@ -13,7 +13,7 @@ specs, instead of copying them.
 |---|---|---|---|
 | [PRD-001](PRD-001-CALIBRATE-PAINT-RIPPLE.md) | Calibrate, paint the room, and footstep ripples | complete-in-sim (v0.4; hardware validation pending) | 2026-11-18 |
 | [PRD-002](PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md) | Surface generation, Synesyn bridge, and Story Stage on Lumur | complete-in-sim (v0.3; hardware validation pending) | 2026-11-18 |
-| [PRD-003](PRD-003-LUMUR-OS-APPLICATION-LAYER.md) | Lumur OS application layer (manifest, compositor, lifecycle) | draft (v0.1) | 2026-11-18 |
+| [PRD-003](PRD-003-LUMUR-OS-APPLICATION-LAYER.md) | Lumur OS application layer (manifest, compositor, lifecycle) | draft / implementing (v0.2; slice 1 complete-in-sim) | 2026-11-18 |
 
 ## Lifecycle
 

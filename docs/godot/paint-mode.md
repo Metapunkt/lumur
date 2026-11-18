@@ -100,6 +100,10 @@ It samples the exported textures, applies a confidence threshold, and looks
 up a 256-wide palette / mode row keyed by surface id. The renderer does not
 call Python or ComfyUI on its critical path ([ADR 0008](../architectural-decisions/0008-comfyui-asynchronous.md)).
 
+Portable apps should declare surfaces in a `lumur.app` manifest and call
+`LumurRoomRuntime.fit_app` rather than hard-coding roles per room — see
+[apps/manifest.md](../apps/manifest.md).
+
 ## How the mapping works
 
 1. Companion scan scatters camera→projector samples into `projector_map.npz`.

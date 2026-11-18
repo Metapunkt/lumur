@@ -1,0 +1,19 @@
+{
+  "schema": "lumur.app",
+  "schema_version": "1.0",
+  "id": "lumur.examples.ripples",
+  "name": "Footstep ripples (example)",
+  "version": "0.1.0",
+  "scene": "res://apps/examples/ripples/ripple_app.tscn",
+  "surfaces": [
+    {
+      "key": "floor",
+      "role": "floor",
+      "min_confidence": 0.15,
+      "required": true
+    }
+  ],
+  "inputs": ["footstep"],
+  "generation": false,
+  "bridge": null
+}

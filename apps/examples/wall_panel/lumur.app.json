@@ -1,0 +1,20 @@
+{
+  "schema": "lumur.app",
+  "schema_version": "1.0",
+  "id": "lumur.examples.wall_panel",
+  "name": "Wall panel (example)",
+  "version": "0.1.0",
+  "scene": "res://apps/examples/wall_panel/wall_panel_app.tscn",
+  "surfaces": [
+    {
+      "key": "panel",
+      "role": "wall",
+      "min_width_m": 2.0,
+      "min_confidence": 0.15,
+      "required": true
+    }
+  ],
+  "inputs": [],
+  "generation": false,
+  "bridge": null
+}

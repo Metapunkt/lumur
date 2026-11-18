@@ -2,7 +2,7 @@
 id: PRD-003
 title: Lumur OS application layer
 status: draft
-version: "0.1"
+version: "0.2"
 owner: Ayodele Arigbabu
 last_reviewed: 2026-11-18
 primary_users: [author, installer, visitor, workshop facilitator]
@@ -143,22 +143,31 @@ is explicitly out of scope — this PRD is the runtime those boots into.
   (`id`, `name`, `version`), schema version, surface requests, and input
   permissions. Apps must not hard-code projector pixel coordinates or raw
   UV for placement.
+  **Status (slice 1):** complete-in-sim — `lumur.app` v1.0 validator in
+  `lumur.schema.app` / `LumurAppManifest`; example packages under
+  `apps/examples/`.
 - **REQ-003-002:** Surface requests must express *kinds* of surfaces — at
   minimum role (`floor`, `wall`, named role), optional minimum extent
   (metres along a major axis), and optional minimum confidence — never
   absolute projector resolution or pixel rects. Exact JSON shape is
   [ADR 0017](../architectural-decisions/0017-app-manifest-format.md).
+  **Status (slice 1):** complete-in-sim — role / `min_width_m` /
+  `min_confidence` / `count` / `required`; placement fields rejected.
 - **REQ-003-003:** At install or launch against a room package, the runtime
   must bind each surface request to concrete surface id(s) / roles from
   `lumur.room` (+ Godot paint `role_index`). Binding must succeed or follow
   the fallback / fail policy in
   [ADR 0018](../architectural-decisions/0018-surface-allocation-and-compositing.md);
   it must not invent geometry.
+  **Status (slice 1):** complete-in-sim — `fit_app_to_room` /
+  `LumurAppFit` with hard-fail / optional-null; sim preset tests.
 - **REQ-003-004:** Room services must expose surfaces, roles, ids, floor
   plane, confidence, and generated-texture handles from the current room
   package as the app-facing “file system”. Apps read through that API /
   facade (`LumurRoomRuntime` and successors), not by opening OpenCV or
   companion internals.
+  **Status (slice 1):** complete-in-sim — `RoomServices` +
+  `LumurRoomRuntime` facade methods.
 
 ### Input bus and permissions
 
@@ -223,6 +232,9 @@ is explicitly out of scope — this PRD is the runtime those boots into.
   headlessly with the existing sim (`--backend sim` presets), companion
   tests, and/or Godot headless / xvfb. Physical projector/webcam validation
   is deferred. Owner acceptance for this PRD does not depend on hardware.
+  **Status (slice 1):** complete-in-sim for REQs 001–004 —
+  `companion/tests/test_app_manifest_fit.py` on `empty_room`,
+  `room_with_box`, `noisy_room` (no hardware).
 
 ## Acceptance
 
@@ -230,10 +242,12 @@ Automated (target, as slices land):
 
 - Parse and validate `lumur.app` manifests; reject pixel/UV placement fields
   (REQ-003-001, REQ-003-002) — companion and/or Godot unit tests.
+  **Done (slice 1):** `test_app_manifest_fit.py` + `LumurAppManifest`.
 - Fit manifests to sim room packages (`empty_room`, `room_with_box`,
   `noisy_room`, wall-poor presets): allocation, fallback, and hard-fail
-  cases (REQ-003-003, REQ-003-004, REQ-003-008) —
+  cases (REQ-003-003, REQ-003-004; REQ-003-008 deferred to slice 3) —
   companion tests against exported `lumur.room` / Godot assets.
+  **Done (slice 1)** for single-app fit / room services.
 - Inject audience events; permission filter delivers only declared types
   (REQ-003-005–007).
 - Two apps sequentially or concurrently on disjoint surfaces; confidence
@@ -314,7 +328,7 @@ keeps Synesyn optional.
   (ADR 0018); input permissions (ADR 0019); existing `lumur.room` /
   `lumur.event` / `SurfaceGenerator`
 - Architectural decision: ADR 0006–0007, 0009, 0012–0019
-- Implementation tracker: none yet (draft PRD)
-- Executable specification: to land per slice under `companion/tests/`
-  (and optional Godot headless scripts), following PRD-001/002 sim posture
+- Implementation tracker: slice 1 in progress (manifest + room fit)
+- Executable specification: `companion/tests/test_app_manifest_fit.py`;
+  authoring guide [`docs/apps/manifest.md`](../apps/manifest.md)
 - Founding notes: [scratchpad](../scratchpad.md)

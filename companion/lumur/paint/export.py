@@ -15,6 +15,7 @@ from typing import Any
 import cv2
 import numpy as np
 
+from lumur.app.metrics import compute_surface_metrics
 from lumur.schema.room import load_room_package
 
 _WALL_LABEL_RE = re.compile(r"^wall_\d+$")
@@ -179,10 +180,13 @@ def export_godot_paint_assets(
         (cam_w, cam_h),
     )
 
-    roles = assign_surface_roles(list(doc.get("planes") or []))
+    planes = list(doc.get("planes") or [])
+    roles = assign_surface_roles(planes)
+    metrics = compute_surface_metrics(points, planes, doc.get("floor_plane_id"))
     surfaces = []
-    for plane in doc.get("planes") or []:
+    for plane in planes:
         pid = int(plane["plane_id"])
+        m = metrics.get(pid, {})
         surfaces.append(
             {
                 "id": pid,
@@ -191,6 +195,10 @@ def export_godot_paint_assets(
                 "roles": roles.get(pid, [str(plane.get("label") or pid)]),
                 "normal": plane.get("normal"),
                 "d": plane.get("d"),
+                # Fit metrics for Godot / room-fit (ADR 0017 / 0018). Additive.
+                "width_m": float(m.get("width_m", 0.0)),
+                "mean_confidence": float(m.get("mean_confidence", 0.0)),
+                "inlier_count": int(plane.get("inlier_count") or 0),
             }
         )
 

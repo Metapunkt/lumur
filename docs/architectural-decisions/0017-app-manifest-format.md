@@ -1,6 +1,6 @@
 # 0017 — App manifest format and versioning
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-11-18
 - **Area:** runtime / apps / interchange
 - **Relates to:** ADR 0006, ADR 0012, ADR 0013, ADR 0018, ADR 0019; PRD-003
@@ -49,9 +49,10 @@ Option 3. Adopt schema `lumur.app` with explicit `schema_version`.
    runtime instantiates and binds allocated surface handles before
    `_ready` work that paints.
 
-### Draft shape (`schema_version` `1.0`)
+### Shape (`schema_version` `1.0`)
 
-Illustrative — normative field list lands with PRD-003 slice 1 tests:
+Normative for PRD-003 slice 1 (validator + tests). Authoring guide:
+[docs/apps/manifest.md](../apps/manifest.md).
 
 ```json
 {
@@ -107,6 +108,6 @@ Allocation and conflict rules live in
   layout they see in one room.
 - Trade-off: v1.0 will be deliberately small; rich adjacency / doorway
   queries from ADR 0006 wait until an app needs them.
-- Follow-up: when Accepted, ship a JSON schema or validator in the
-  companion and a Godot loader; mark this ADR Accepted with the slice 1
-  merge.
+- Follow-up done (slice 1): companion validator (`lumur.schema.app`) and
+  Godot loader (`LumurAppManifest`); room-fit in `lumur.app.fit` /
+  `LumurAppFit`. Compositor ownership remains ADR 0018 / later slices.
