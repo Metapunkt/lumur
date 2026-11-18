@@ -5,6 +5,11 @@ extends Node
 ## Envelope: ``{"schema":"lumur.event","schema_version":"1.0","event":{...}}``.
 
 signal footstep(event: Dictionary)
+signal presence(event: Dictionary)
+signal zone_enter(event: Dictionary)
+signal zone_leave(event: Dictionary)
+signal gathering(event: Dictionary)
+signal audience_event(event: Dictionary)
 signal raw_event(event: Dictionary)
 
 @export var bind_host: String = "127.0.0.1"
@@ -63,8 +68,21 @@ func _handle_packet(packet: PackedByteArray) -> void:
 		return
 	var ev: Dictionary = event
 	raw_event.emit(ev)
-	if str(ev.get("type", "")) == "footstep":
+	var ev_type := str(ev.get("type", ""))
+	if ev_type == "footstep":
 		footstep.emit(ev)
+	elif ev_type == "presence":
+		presence.emit(ev)
+		audience_event.emit(ev)
+	elif ev_type == "zone_enter":
+		zone_enter.emit(ev)
+		audience_event.emit(ev)
+	elif ev_type == "zone_leave":
+		zone_leave.emit(ev)
+		audience_event.emit(ev)
+	elif ev_type == "gathering":
+		gathering.emit(ev)
+		audience_event.emit(ev)
 
 
 func inject_event_json(text: String) -> void:

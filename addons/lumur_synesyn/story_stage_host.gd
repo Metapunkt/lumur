@@ -9,14 +9,17 @@ extends RefCounted
 ## host (or a thin subclass) to ``stage.host`` before ``add_child`` — same
 ## contract as Synesyn's playback host.
 ##
-## Audience steering (slice 4) is not implemented here: presence / zone /
-## gathering events are accepted for ambience forwarding only and never advance
-## story state.
+## Audience steering (slice 4): presence / zone / gathering advance story state
+## only when ``lumur_audience`` opts in (see ``LumurAudienceSteering``).
 
 signal story_log_changed
 signal voice_owner_changed(stage_owns_voice: bool)
 signal phase_changed(phase: String)
 signal ambience_event(event: Dictionary)
+signal audience_steered(action: Dictionary)
+
+var audience_steering: LumurAudienceSteering = LumurAudienceSteering.new()
+var steered_actions: Array = []
 
 const FEATURE_STORY_LOG_VIEW := &"story_log_view"
 const FEATURE_LANDING := &"landing"
@@ -42,6 +45,39 @@ var _stage_voice_owned: bool = true
 func set_scenario(next: Dictionary) -> void:
 	scenario = next.duplicate(true)
 	layout = LumurStoryStageLayout.from_scenario(scenario)
+	audience_steering.host = self
+	audience_steering.configure_from_scenario(scenario)
+	steered_actions.clear()
+
+
+func audience_steering_enabled() -> bool:
+	return audience_steering.enabled
+
+
+func process_audience_event(event: Dictionary) -> Array:
+	return audience_steering.process_event(event)
+
+
+func tick_audience(timestamp: float) -> Array:
+	return audience_steering.tick(timestamp)
+
+
+func apply_audience_action(action: Dictionary) -> void:
+	## Called by LumurAudienceSteering when opted in.
+	steered_actions.append(action)
+	audience_steered.emit(action)
+	var kind := str(action.get("kind", ""))
+	if kind == "choose_option":
+		var label := str(action.get("option_label", "option:%s" % str(action.get("option_index", 0))))
+		append_story_log_entry({
+			"sender": "_audience",
+			"message": label,
+			"timestamp_us": int(float(action.get("timestamp", 0.0)) * 1000000.0),
+		})
+	elif kind == "advance_beat":
+		phase_changed.emit("beat_%d" % steered_actions.size())
+	elif kind == "append_log" and action.has("entry"):
+		append_story_log_entry(action["entry"])
 
 
 func get_scenario() -> Dictionary:
@@ -169,8 +205,13 @@ func get_backgrounds_dir() -> String:
 
 func forward_ambience_event(event: Dictionary) -> void:
 	## Presence / footstep may drive ambience and PRD-001 ripples (REQ-002-012).
-	## Slice 4 will gate story advancement on an audience-steering section.
+	## Story advancement is gated by ``lumur_audience`` via audience_steering.
 	ambience_event.emit(event)
+
+
+func load_story_log_entries(entries: Array) -> void:
+	## Playback host pattern (Synesyn StoryLogPlaybackHost analogue).
+	set_story_log_entries(entries)
 
 
 func ignore_unknown_scenario_sections() -> bool:

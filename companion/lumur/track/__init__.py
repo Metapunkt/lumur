@@ -1,5 +1,8 @@
 """Pose, predicted-frame subtraction, tracking, and footstep events.
 
+Audience presence / zone / gathering live in ``lumur.audience`` (import that
+package directly — avoided here to prevent an import cycle with footsteps).
+
 See docs/companion/tracking.md and ADR 0005 / ADR 0014.
 """
 

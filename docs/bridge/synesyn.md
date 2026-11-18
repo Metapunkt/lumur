@@ -145,6 +145,11 @@ Synes-bot’s fork only.
 Slice 3 (layer → surface mapping, stub + paint / sim verification):
 [story-stage.md](story-stage.md).
 
+## Audience steering + replay
+
+Slice 4 (opt-in `[LUMUR_AUDIENCE]`, session recording, Story Log replay):
+[audience-steering.md](audience-steering.md), [replay.md](replay.md).
+
 ## Licence
 
 Companion / addon source: MIT. This document: CC BY-SA 4.0.
