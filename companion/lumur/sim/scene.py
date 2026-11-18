@@ -184,10 +184,13 @@ def load_scene(path: str | Path) -> SimScene:
     """Load a scene description from JSON or YAML."""
     path = Path(path)
     if not path.is_file():
-        # Allow bare preset names.
+        # Allow bare preset names. Preserve "unknown preset …; available: …".
+        bare = path.suffix == "" and len(path.parts) == 1
         try:
             path = preset_path(str(path))
-        except FileNotFoundError:
+        except FileNotFoundError as exc:
+            if bare:
+                raise FileNotFoundError(str(exc)) from None
             raise FileNotFoundError(f"scene file not found: {path}") from None
     cfg = _load_raw(path)
     return SimScene(

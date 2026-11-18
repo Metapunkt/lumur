@@ -8,6 +8,13 @@ import numpy as np
 
 from lumur.scan.masks import MASK_LOW_CONFIDENCE, MASK_VALID
 
+# Gravity alignment bands (OpenCV upright camera: +Y ≈ gravity).
+# |n·g| < WALL_ALIGN_MAX  → wall-like (vertical)
+# |n·g| > FLOOR_ALIGN_MIN → floor-like (horizontal)
+# in between              → tilted junk (reject / non_planar)
+WALL_ALIGN_MAX = 0.35
+FLOOR_ALIGN_MIN = 0.70
+
 
 @dataclass(frozen=True)
 class FittedPlane:
@@ -172,6 +179,129 @@ def identify_floor_plane(
     return best_id
 
 
+def _refit_plane_from_pixels(
+    plane_id: int,
+    pts_all: np.ndarray,
+    sel: np.ndarray,
+    *,
+    kind: str = "surface",
+    label: str | None = None,
+) -> FittedPlane:
+    pts = pts_all[sel]
+    normal, d = _fit_plane_svd(pts)
+    normal, d = _orient_normal_toward_camera(normal, d)
+    resid = pts @ normal + d
+    rms = float(np.sqrt(np.mean(np.square(resid))))
+    return FittedPlane(
+        plane_id=plane_id,
+        normal=normal,
+        d=d,
+        inlier_count=int(sel.sum()),
+        residual_rms_m=rms,
+        kind=kind,
+        label=label or f"surface_{plane_id}",
+    )
+
+
+def _merge_coplanar_planes(
+    fitted: list[FittedPlane],
+    surface_id: np.ndarray,
+    ys: np.ndarray,
+    xs: np.ndarray,
+    pts_all: np.ndarray,
+    *,
+    normal_dot: float,
+    distance_m: float,
+) -> list[FittedPlane]:
+    """Merge plane pairs with similar normals that lie nearly on one plane."""
+    planes = list(fitted)
+    changed = True
+    while changed:
+        changed = False
+        for i in range(len(planes)):
+            for j in range(i + 1, len(planes)):
+                a, b = planes[i], planes[j]
+                na, da = a.normal, a.d
+                nb = b.normal
+                dot = float(na @ nb)
+                if dot < 0:
+                    nb = -nb
+                    dot = -dot
+                if dot < normal_dot:
+                    continue
+                sel_b = surface_id[ys, xs] == b.plane_id
+                if not np.any(sel_b):
+                    continue
+                mean_dist = float(np.mean(np.abs(pts_all[sel_b] @ na + da)))
+                if mean_dist > distance_m:
+                    continue
+                keep, drop = (a, b) if a.inlier_count >= b.inlier_count else (b, a)
+                surface_id[surface_id == drop.plane_id] = keep.plane_id
+                sel = surface_id[ys, xs] == keep.plane_id
+                new_p = _refit_plane_from_pixels(
+                    keep.plane_id, pts_all, sel, kind=keep.kind, label=keep.label
+                )
+                planes = [
+                    p
+                    for p in planes
+                    if p.plane_id not in (keep.plane_id, drop.plane_id)
+                ]
+                planes.append(new_p)
+                changed = True
+                break
+            if changed:
+                break
+    return planes
+
+
+def _collapse_floor_duplicates(
+    fitted: list[FittedPlane],
+    surface_id: np.ndarray,
+    ys: np.ndarray,
+    xs: np.ndarray,
+    pts_all: np.ndarray,
+    g: np.ndarray,
+    *,
+    gravity_camera: np.ndarray | None,
+    merge_distance_m: float,
+) -> list[FittedPlane]:
+    """Keep one floor; merge or demote other floor-like parallel fragments."""
+    floor_id = identify_floor_plane(fitted, gravity_camera=gravity_camera)
+    if floor_id is None:
+        return fitted
+    floor = next(p for p in fitted if p.plane_id == floor_id)
+    survivors: list[FittedPlane] = []
+    for p in fitted:
+        if p.plane_id == floor_id:
+            survivors.append(p)
+            continue
+        align = abs(float(p.normal @ g))
+        if align < FLOOR_ALIGN_MIN:
+            survivors.append(p)
+            continue
+        sel = surface_id[ys, xs] == p.plane_id
+        mean_dist = (
+            float(np.mean(np.abs(pts_all[sel] @ floor.normal + floor.d)))
+            if np.any(sel)
+            else 1e9
+        )
+        if mean_dist <= merge_distance_m * 1.5:
+            surface_id[surface_id == p.plane_id] = floor_id
+        else:
+            surface_id[surface_id == p.plane_id] = 0
+    sel = surface_id[ys, xs] == floor_id
+    if np.any(sel):
+        floor_refit = _refit_plane_from_pixels(
+            floor_id, pts_all, sel, kind="floor", label="floor"
+        )
+        survivors = [
+            floor_refit if p.plane_id == floor_id else p for p in survivors
+        ]
+        if not any(p.plane_id == floor_id for p in survivors):
+            survivors.insert(0, floor_refit)
+    return survivors
+
+
 def segment_planes(
     points: np.ndarray,
     mask: np.ndarray,
@@ -183,6 +313,8 @@ def segment_planes(
     residual_rms_wall_m: float = 0.05,
     rng: np.random.Generator | None = None,
     gravity_camera: np.ndarray | None = None,
+    merge_normal_dot: float = 0.98,
+    merge_distance_m: float = 0.10,
 ) -> PlaneSegmentation:
     """Sequential RANSAC plane extraction + floor / wall labelling.
 
@@ -190,6 +322,10 @@ def segment_planes(
     ``plane_id``. Leftover valid points after plane extraction are labelled
     as a single ``non_planar`` surface so furniture (e.g. a box) is retained
     without inventing bridging triangles.
+
+    Tilted RANSAC fragments (neither wall- nor floor-like) are rejected so
+    empty rooms do not explode into many ``surface_*`` planes. Near-coplanar
+    fragments are merged afterward.
     """
     h, w = mask.shape
     surface_id = np.zeros((h, w), dtype=np.int32)
@@ -207,8 +343,16 @@ def segment_planes(
     fitted: list[FittedPlane] = []
     next_id = 1
     min_inl = max(min_inliers, int(min_inlier_fraction * ys.size))
+    g = (
+        np.asarray(gravity_camera, dtype=np.float64)
+        if gravity_camera is not None
+        else np.array([0.0, 1.0, 0.0], dtype=np.float64)
+    )
+    g = g / np.linalg.norm(g)
 
-    for _ in range(max_planes):
+    attempts = 0
+    while len(fitted) < max_planes and attempts < max_planes + 8:
+        attempts += 1
         idx = np.where(remaining)[0]
         if idx.size < min_inl:
             break
@@ -226,56 +370,48 @@ def segment_planes(
         normal, d = _orient_normal_toward_camera(normal, d)
         global_inliers = np.zeros(ys.size, dtype=bool)
         global_inliers[idx[local_inliers]] = True
-        # Assign pixels.
-        plane = FittedPlane(
-            plane_id=next_id,
-            normal=normal,
-            d=d,
-            inlier_count=int(global_inliers.sum()),
-            residual_rms_m=rms,
-            kind="surface",
-            label=f"surface_{next_id}",
+        align = abs(float(normal @ g))
+        if WALL_ALIGN_MAX <= align <= FLOOR_ALIGN_MIN:
+            # Tilted junk — drop from the RANSAC pool (non_planar later).
+            remaining[global_inliers] = False
+            continue
+        fitted.append(
+            FittedPlane(
+                plane_id=next_id,
+                normal=normal,
+                d=d,
+                inlier_count=int(global_inliers.sum()),
+                residual_rms_m=rms,
+                kind="surface",
+                label=f"surface_{next_id}",
+            )
         )
-        fitted.append(plane)
         surface_id[ys[global_inliers], xs[global_inliers]] = next_id
         remaining[global_inliers] = False
         next_id += 1
-        # Tighten minimum as points dwindle.
         min_inl = max(min_inliers, int(min_inlier_fraction * int(remaining.sum())))
 
-    floor_id = identify_floor_plane(fitted, gravity_camera=gravity_camera)
-    g = (
-        np.asarray(gravity_camera, dtype=np.float64)
-        if gravity_camera is not None
-        else np.array([0.0, 1.0, 0.0], dtype=np.float64)
-    )
-    g = g / np.linalg.norm(g)
-
-    relabelled: list[FittedPlane] = []
-    for p in fitted:
-        if floor_id is not None and p.plane_id == floor_id:
-            kind, label = "floor", "floor"
-        else:
-            horizontal = abs(float(p.normal @ g))
-            if horizontal < 0.35:
-                kind, label = "wall", f"wall_{p.plane_id}"
-            else:
-                kind, label = "surface", f"surface_{p.plane_id}"
-        relabelled.append(
-            FittedPlane(
-                plane_id=p.plane_id,
-                normal=p.normal,
-                d=p.d,
-                inlier_count=p.inlier_count,
-                residual_rms_m=p.residual_rms_m,
-                kind=kind,
-                label=label,
-            )
+    # Absorb leftover points that still lie on an accepted plane.
+    absorb_thr = distance_threshold_m * 1.75
+    for i, p in enumerate(list(fitted)):
+        idx = np.where(remaining)[0]
+        if idx.size == 0:
+            break
+        dist = np.abs(pts_all[idx] @ p.normal + p.d)
+        take = dist <= absorb_thr
+        if not np.any(take):
+            continue
+        global_inliers = np.zeros(ys.size, dtype=bool)
+        global_inliers[idx[take]] = True
+        surface_id[ys[global_inliers], xs[global_inliers]] = p.plane_id
+        remaining[global_inliers] = False
+        sel = surface_id[ys, xs] == p.plane_id
+        fitted[i] = _refit_plane_from_pixels(
+            p.plane_id, pts_all, sel, kind=p.kind, label=p.label
         )
 
     leftover = remaining.copy()
-    # A few extra small planar patches (e.g. box faces), then a single
-    # non_planar bucket for the rest — do not invent a mesh across gaps.
+    # Extra wall-like patches only (box faces, missed walls) — no more floors.
     extra_budget = 3
     while extra_budget > 0:
         idx = np.where(leftover)[0]
@@ -294,9 +430,15 @@ def segment_planes(
         if int(local_inliers.sum()) < max(25, min_inliers // 2):
             break
         normal, d = _orient_normal_toward_camera(normal, d)
+        align = abs(float(normal @ g))
         global_inliers = np.zeros(ys.size, dtype=bool)
         global_inliers[idx[local_inliers]] = True
-        relabelled.append(
+        if align >= WALL_ALIGN_MAX:
+            # Tilted or floor-like extras → non_planar, do not mint surface_*.
+            leftover[global_inliers] = False
+            extra_budget -= 1
+            continue
+        fitted.append(
             FittedPlane(
                 plane_id=next_id,
                 normal=normal,
@@ -312,7 +454,51 @@ def segment_planes(
         next_id += 1
         extra_budget -= 1
 
-    non_planar_count = int(leftover.sum())
+    fitted = _merge_coplanar_planes(
+        fitted,
+        surface_id,
+        ys,
+        xs,
+        pts_all,
+        normal_dot=merge_normal_dot,
+        distance_m=merge_distance_m,
+    )
+    fitted = _collapse_floor_duplicates(
+        fitted,
+        surface_id,
+        ys,
+        xs,
+        pts_all,
+        g,
+        gravity_camera=gravity_camera,
+        merge_distance_m=merge_distance_m,
+    )
+
+    floor_id = identify_floor_plane(fitted, gravity_camera=gravity_camera)
+    relabelled: list[FittedPlane] = []
+    for p in sorted(fitted, key=lambda x: x.plane_id):
+        if floor_id is not None and p.plane_id == floor_id:
+            kind, label = "floor", "floor"
+        else:
+            horizontal = abs(float(p.normal @ g))
+            if horizontal < WALL_ALIGN_MAX:
+                kind, label = "wall", f"wall_{p.plane_id}"
+            else:
+                kind, label = "surface", f"surface_{p.plane_id}"
+        relabelled.append(
+            FittedPlane(
+                plane_id=p.plane_id,
+                normal=p.normal,
+                d=p.d,
+                inlier_count=p.inlier_count,
+                residual_rms_m=p.residual_rms_m,
+                kind=kind,
+                label=label,
+            )
+        )
+
+    unassigned = surface_id[ys, xs] == 0
+    non_planar_count = int(unassigned.sum())
     if non_planar_count > 0:
         relabelled.append(
             FittedPlane(
@@ -325,7 +511,7 @@ def segment_planes(
                 label="non_planar",
             )
         )
-        surface_id[ys[leftover], xs[leftover]] = next_id
+        surface_id[ys[unassigned], xs[unassigned]] = next_id
 
     return PlaneSegmentation(
         planes=relabelled,

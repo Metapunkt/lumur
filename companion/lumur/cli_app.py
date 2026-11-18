@@ -88,10 +88,12 @@ def _main(argv: list[str] | None = None) -> int:
         from lumur.app.fit import fit_app_to_room
         from lumur.app.generation import bridge_app_roots, bundled_app_roots
         from lumur.app.room_services import RoomServices
+        from lumur.paths import find_repo_root
 
-        roots = list(bundled_app_roots())
+        repo_root = find_repo_root()
+        roots = list(bundled_app_roots(repo_root))
         if args.bridge:
-            roots.extend(bridge_app_roots())
+            roots.extend(bridge_app_roots(repo_root))
         roots.extend(args.root or [])
         room = None
         if args.room:
@@ -128,9 +130,7 @@ def _main(argv: list[str] | None = None) -> int:
     if args.command == "run":
         require_path(args.manifest, kind="manifest")
         require_path(args.room, kind="room")
-        from lumur.app.compositor import Compositor
         from lumur.app.fit import fit_app_to_room
-        from lumur.app.input_bus import AppInputBus
         from lumur.app.lifecycle import AppLifecycle, AppState
         from lumur.app.room_services import RoomServices
 
@@ -143,14 +143,18 @@ def _main(argv: list[str] | None = None) -> int:
                 hint="hint: lumur-app fit <manifest> --room <dir>",
                 code=1,
             )
-        life = AppLifecycle()
-        life.setup(room, AppInputBus(), Compositor())
+        life = AppLifecycle.create(room)
         app_id = str(doc["id"])
-        life.install(doc, source_path=str(args.manifest))
+        life.install(args.manifest)
         life.launch(app_id)
         rec = life.get(app_id)
         state = rec.state.value if isinstance(rec.state, AppState) else str(rec.state)
-        print(json.dumps({"ok": True, "id": app_id, "state": state, "fit": fit.to_dict()}, indent=2))
+        print(
+            json.dumps(
+                {"ok": True, "id": app_id, "state": state, "fit": fit.to_dict()},
+                indent=2,
+            )
+        )
         return 0
 
     raise CliError(f"unknown command {args.command!r}")

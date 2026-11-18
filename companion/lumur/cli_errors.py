@@ -40,7 +40,19 @@ def run_cli(main: Callable[[list[str] | None], int], argv: list[str] | None = No
             print(exc.hint, file=sys.stderr)
         return int(exc.code)
     except FileNotFoundError as exc:
-        path = getattr(exc, "filename", None) or str(exc)
+        msg = str(exc)
+        low = msg.lower()
+        # Mistyped --scene / missing preset: never suggest lumur-scan.
+        if "unknown preset" in low or (
+            "available:" in low and ("preset" in low or "scene" in low)
+        ):
+            print(msg, file=sys.stderr)
+            print(
+                f"unknown scene — available presets: {format_presets()}",
+                file=sys.stderr,
+            )
+            return 2
+        path = getattr(exc, "filename", None) or msg
         print(f"not found: {path}", file=sys.stderr)
         lower = str(path).lower()
         if "calibrat" in lower or str(path).endswith(".json"):
@@ -48,7 +60,9 @@ def run_cli(main: Callable[[list[str] | None], int], argv: list[str] | None = No
                 "hint: run lumur-calibrate first, then pass --calibration <file>",
                 file=sys.stderr,
             )
-        elif "room" in lower or "godot" in lower:
+        elif "godot" in lower or (
+            "room" in lower and "typo" not in lower and "preset" not in lower
+        ):
             print(
                 "hint: run lumur-scan -o <dir>, then lumur-export-godot <dir>",
                 file=sys.stderr,
@@ -71,13 +85,23 @@ def run_cli(main: Callable[[list[str] | None], int], argv: list[str] | None = No
                 file=sys.stderr,
             )
         return 2
+    except RuntimeError as exc:
+        err = str(exc).lower()
+        print(f"error: {exc}", file=sys.stderr)
+        if "camera" in err or "could not open" in err or "video" in err:
+            print(
+                "hint: no camera? try --backend sim --scene empty_room",
+                file=sys.stderr,
+            )
+            return 2
+        return 1
     except ValueError as exc:
         msg = str(exc)
         print(msg, file=sys.stderr)
         low = msg.lower()
         if "scene" in low or "preset" in low:
             print(
-                f"hint: known sim presets: {format_presets()}",
+                f"unknown scene — available presets: {format_presets()}",
                 file=sys.stderr,
             )
         elif "camera" in low:

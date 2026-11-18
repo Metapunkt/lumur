@@ -5,8 +5,8 @@ null, deterministic preference. Multi-app ownership lives in later slices.
 
 Parity note: Godot mirrors this logic in ``addons/lumur/app_fit.gd``
 (``LumurAppFit``). Keep matching rules (role / kind / min_width_m /
-min_confidence / required) aligned when changing either side; there is no
-automated cross-language parity suite yet.
+min_confidence / required) aligned when changing either side. Cross-language
+checks live in ``tests/test_app_parity_godot.py`` (runs when Godot is available).
 """
 
 from __future__ import annotations

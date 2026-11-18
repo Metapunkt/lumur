@@ -30,3 +30,5 @@ moved path, but the decision itself stands until a successor replaces it.
 | [0017](0017-app-manifest-format.md) | App manifest format and versioning (`lumur.app`) | Accepted | 2026-11-18 |
 | [0018](0018-surface-allocation-and-compositing.md) | Surface allocation and compositing rules | Accepted | 2026-11-18 |
 | [0019](0019-app-input-permissions.md) | Per-app input permissions for room events | Accepted | 2026-11-18 |
+| [0020](0020-coplanar-plane-merge.md) | Coplanar plane merge and tilt reject in room scan | Accepted | 2026-11-19 |
+| [0021](0021-godot-import-before-class-cache.md) | Godot import step before `class_name` use | Accepted | 2026-11-19 |

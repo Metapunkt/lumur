@@ -197,6 +197,23 @@ def test_paint_through_sim_lands_on_correct_surfaces(tmp_path: Path):
     assert float(wall_ok) > 0.85
 
 
+def _ensure_godot_import(godot: Path) -> None:
+    """First-run import so class_name resolves (ADR 0021 / tools/godot_import.sh)."""
+    if (REPO_ROOT / ".godot").is_dir():
+        return
+    env = os.environ.copy()
+    env["GODOT_BIN"] = str(godot)
+    proc = subprocess.run(
+        ["bash", str(REPO_ROOT / "tools" / "godot_import.sh")],
+        cwd=str(REPO_ROOT),
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=180,
+    )
+    assert proc.returncode == 0, f"godot import failed:\n{proc.stdout}\n{proc.stderr}"
+
+
 def test_godot_headless_paint_render(tmp_path: Path):
     """When Godot is available, render paint PNG and cross-check vs reference."""
     godot = _find_godot()
@@ -205,6 +222,7 @@ def test_godot_headless_paint_render(tmp_path: Path):
             "Godot binary not found (set GODOT_BIN to a Godot 4 binary). "
             "Python reference paint tests still cover mapping; see docs/godot/paint-mode.md."
         )
+    _ensure_godot_import(godot)
 
     room_dir, _rig, _result = _scan_room(tmp_path)
     godot_dir = export_godot_paint_assets(room_dir)

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib
 import sys
 
 
@@ -12,6 +13,7 @@ _COMMANDS = {
     "export-godot": ("lumur.cli_export_godot", "main"),
     "track": ("lumur.cli_track", "main"),
     "generate": ("lumur.cli_generate", "main"),
+    "generate-synesyn": ("lumur_synesyn.cli", "main"),
     "app": ("lumur.cli_app", "main"),
 }
 
@@ -53,8 +55,19 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 2
     module_name, attr = _COMMANDS[command]
-    import importlib
-
+    if command == "generate-synesyn":
+        try:
+            module = importlib.import_module(module_name)
+        except ImportError:
+            print(
+                "generate-synesyn requires the optional lumur_synesyn bridge package. "
+                "Install companion with the synesyn extra, or use lumur-generate for "
+                "direct ComfyUI. Hub URL is also required "
+                "(--hub-url / LUMUR_SYNESYN_HUB_URL).",
+                file=sys.stderr,
+            )
+            return 2
+        return int(getattr(module, attr)(rest))
     module = importlib.import_module(module_name)
     return int(getattr(module, attr)(rest))
 
