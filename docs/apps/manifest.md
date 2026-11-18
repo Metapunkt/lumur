@@ -131,6 +131,10 @@ Headless companion tests in `companion/tests/test_app_manifest_fit.py` cover
 valid / invalid manifests, version handling, fit success, fallback / failure,
 and deterministic binding on `empty_room`, `room_with_box`, and `noisy_room`.
 
+## Related
+
+Per-app input allowlist and event bus: [input.md](input.md) (PRD-003 slice 2).
+
 ## Licence
 
 Source code MIT. This document CC BY-SA 4.0.

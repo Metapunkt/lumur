@@ -18,8 +18,8 @@ and [PRD-002](docs/product-requirements/PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md)
 are **complete-in-sim** (calibrate → paint → ripples; generation, Synesyn
 bridge, Story Stage, opt-in audience steering / replay — all against the
 sim and mocks). [PRD-003](docs/product-requirements/PRD-003-LUMUR-OS-APPLICATION-LAYER.md)
-is in progress: **slice 1 (manifest + room fit) complete-in-sim**; later
-slices cover input permissions, compositor/lifecycle, and bundled apps.
+is in progress: **slices 1–2 (manifest + room fit; input permissions)
+complete-in-sim**; later slices cover compositor/lifecycle and bundled apps.
 Hardware validation is still pending. Founding intent:
 [scratchpad](docs/scratchpad.md),
 [ADRs](docs/architectural-decisions/README.md),
