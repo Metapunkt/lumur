@@ -1,0 +1,125 @@
+{
+  "schema": "lumur.calibration",
+  "schema_version": "1.0",
+  "created_at": "2026-11-18T22:43:36.337924+00:00",
+  "projector_resolution": [
+    64,
+    48
+  ],
+  "camera": {
+    "image_size": [
+      80,
+      60
+    ],
+    "matrix": [
+      [
+        57.62946380913498,
+        0.0,
+        40.0
+      ],
+      [
+        0.0,
+        57.62946380913498,
+        30.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "distortion": [
+      0.02,
+      -0.01,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "projector": {
+    "image_size": [
+      64,
+      48
+    ],
+    "matrix": [
+      [
+        61.44,
+        0.0,
+        32.0
+      ],
+      [
+        0.0,
+        61.44,
+        24.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "distortion": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "stereo": {
+    "R": [
+      [
+        0.9960592042535658,
+        0.014625582414156013,
+        0.0874765909303743
+      ],
+      [
+        -0.017740807857597796,
+        0.9992318893278607,
+        0.034941309174586266
+      ],
+      [
+        -0.08689836223032688,
+        -0.03635551800374942,
+        0.9955535901961109
+      ]
+    ],
+    "T": [
+      -0.23967917466433183,
+      -0.2207279126779048,
+      -0.14700637393541577
+    ],
+    "scale_source": "measured_distance",
+    "measured_distance_m": 1.08
+  },
+  "residuals": {
+    "mean_px": 0.820963442325592,
+    "rms_px": 0.952872097492218,
+    "median_px": 0.7270181179046631,
+    "count": 2272,
+    "worst_region": {
+      "bbox": [
+        0,
+        48,
+        16,
+        60
+      ],
+      "mean_px": 2.188410758972168,
+      "rms_px": 2.254011631011963,
+      "count": 35
+    }
+  },
+  "correspondence_valid_fraction": 0.47333333333333333,
+  "method": "plane_measured_distance",
+  "notes": {
+    "backend": "sim",
+    "camera_lock": {
+      "exposure_locked": true,
+      "white_balance_locked": true,
+      "notes": [
+        "simulated camera; AE/AWB locked"
+      ]
+    },
+    "scene": "empty_room"
+  }
+}

@@ -1,0 +1,196 @@
+{
+  "schema": "lumur.paint_godot",
+  "schema_version": "1.0",
+  "room_schema": "lumur.room",
+  "room_schema_version": "1.0",
+  "projector_resolution": [
+    64,
+    48
+  ],
+  "camera_resolution": [
+    80,
+    60
+  ],
+  "floor_plane_id": 1,
+  "confidence_threshold_default": 0.05,
+  "textures": {
+    "surface_id": "surface_id.png",
+    "confidence": "confidence.png",
+    "lookup": "lookup.png"
+  },
+  "texture_encoding": {
+    "surface_id": "R8 pixel value = surface_id (0 = none)",
+    "confidence": "R8 pixel value = confidence * 255",
+    "lookup": "RGB8; R = cam_u / camera_width * 255, G = cam_v / camera_height * 255, B = 255 if valid else 0. Distortion is baked into the Gray-code correspondence."
+  },
+  "surfaces": [
+    {
+      "id": 1,
+      "kind": "floor",
+      "label": "floor",
+      "roles": [
+        "floor"
+      ],
+      "normal": [
+        -0.014531481772183975,
+        -0.9671766753608245,
+        0.2536890117358002
+      ],
+      "d": -1.1718056231135874,
+      "width_m": 3.930648813840755,
+      "mean_confidence": 0.5553688209118515,
+      "inlier_count": 464
+    },
+    {
+      "id": 2,
+      "kind": "surface",
+      "label": "surface_2",
+      "roles": [
+        "surface_2"
+      ],
+      "normal": [
+        0.15122120595300603,
+        0.3879971782920184,
+        0.9091701361722956
+      ],
+      "d": -3.568978612367026,
+      "width_m": 3.8601720854699595,
+      "mean_confidence": 0.45422787030241385,
+      "inlier_count": 268
+    },
+    {
+      "id": 3,
+      "kind": "wall",
+      "label": "wall_3",
+      "roles": [
+        "wall_1",
+        "label:wall_3"
+      ],
+      "normal": [
+        0.02385415995479902,
+        0.033264761009132754,
+        0.9991618661297359
+      ],
+      "d": -3.7511225779962323,
+      "width_m": 3.642316249288127,
+      "mean_confidence": 0.4427137136170008,
+      "inlier_count": 206
+    },
+    {
+      "id": 4,
+      "kind": "wall",
+      "label": "wall_4",
+      "roles": [
+        "wall_2",
+        "label:wall_4"
+      ],
+      "normal": [
+        -0.029098381486289585,
+        0.2945694048085715,
+        0.9551869711975778
+      ],
+      "d": -3.707987077315859,
+      "width_m": 3.768166544138575,
+      "mean_confidence": 0.4377307707674048,
+      "inlier_count": 178
+    },
+    {
+      "id": 5,
+      "kind": "surface",
+      "label": "surface_5",
+      "roles": [
+        "surface_5"
+      ],
+      "normal": [
+        0.018326336941123296,
+        -0.9871908830430683,
+        0.15848755727490904
+      ],
+      "d": -0.9202850788654988,
+      "width_m": 3.1976132059064417,
+      "mean_confidence": 0.5523487766975252,
+      "inlier_count": 203
+    },
+    {
+      "id": 6,
+      "kind": "surface",
+      "label": "surface_6",
+      "roles": [
+        "surface_6"
+      ],
+      "normal": [
+        0.41798813259637235,
+        0.6631036215982102,
+        0.620950487584908
+      ],
+      "d": -2.6797554498531158,
+      "width_m": 3.4040195595750777,
+      "mean_confidence": 0.45060356213173397,
+      "inlier_count": 142
+    },
+    {
+      "id": 7,
+      "kind": "surface",
+      "label": "surface_7",
+      "roles": [
+        "surface_7"
+      ],
+      "normal": [
+        0.39031891361217746,
+        0.5875014943151448,
+        0.7088675051475286
+      ],
+      "d": -2.650954883158816,
+      "width_m": 2.8897860278660215,
+      "mean_confidence": 0.5071059499694183,
+      "inlier_count": 113
+    },
+    {
+      "id": 8,
+      "kind": "surface",
+      "label": "surface_8",
+      "roles": [
+        "surface_8"
+      ],
+      "normal": [
+        0.5909260873195499,
+        0.7001072704859405,
+        0.40081937220889663
+      ],
+      "d": -2.1537134960880757,
+      "width_m": 2.202629076361515,
+      "mean_confidence": 0.4368686367725504,
+      "inlier_count": 116
+    },
+    {
+      "id": 9,
+      "kind": "non_planar",
+      "label": "non_planar",
+      "roles": [
+        "non_planar"
+      ],
+      "normal": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "d": 0.0,
+      "width_m": 0.0,
+      "mean_confidence": 0.0,
+      "inlier_count": 582
+    }
+  ],
+  "role_index": {
+    "floor": 1,
+    "surface_2": 2,
+    "wall_1": 3,
+    "label:wall_3": 3,
+    "wall_2": 4,
+    "label:wall_4": 4,
+    "surface_5": 5,
+    "surface_6": 6,
+    "surface_7": 7,
+    "surface_8": 8,
+    "non_planar": 9
+  }
+}

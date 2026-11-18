@@ -24,17 +24,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
 from urllib.parse import urlparse
 
-import cv2
-import numpy as np
 
-
-def _png_bytes(width: int, height: int, color_bgr: tuple[int, int, int] = (40, 90, 200)) -> bytes:
-    img = np.zeros((max(height, 1), max(width, 1), 3), dtype=np.uint8)
-    img[:, :] = color_bgr
-    ok, buf = cv2.imencode(".png", img)
-    if not ok:
-        raise RuntimeError("png encode failed")
-    return buf.tobytes()
+from tests.png_bytes import png_bytes as _png_bytes
 
 
 def _extract_size(workflow: dict[str, Any]) -> tuple[int, int]:

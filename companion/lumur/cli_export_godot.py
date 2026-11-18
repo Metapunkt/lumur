@@ -30,10 +30,12 @@ def build_parser() -> argparse.ArgumentParser:
     return p
 
 
-def main(argv: list[str] | None = None) -> int:
+def _main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    from lumur.cli_errors import require_path
     from lumur.paint.export import export_godot_paint_assets
 
+    require_path(args.room_package, kind="room")
     out = export_godot_paint_assets(
         args.room_package,
         confidence_threshold=args.confidence_threshold,
@@ -52,6 +54,12 @@ def main(argv: list[str] | None = None) -> int:
         )
     )
     return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    from lumur.cli_errors import run_cli
+
+    return run_cli(_main, argv)
 
 
 if __name__ == "__main__":

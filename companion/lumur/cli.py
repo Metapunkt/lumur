@@ -28,7 +28,8 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help=(
             "sim scene JSON/YAML path or preset name "
-            "(empty_room, room_with_box, noisy_room); required for --backend sim"
+            "(empty_room, room_with_box, noisy_room, room_with_walkers); "
+            "required for --backend sim"
         ),
     )
     p.add_argument("--camera", default="0", help="camera index or device path")
@@ -111,7 +112,7 @@ def _parse_uv(value: str) -> tuple[float, float]:
     return float(u), float(v)
 
 
-def main(argv: list[str] | None = None) -> int:
+def _main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
 
     from lumur.calibrate.geometry import (
@@ -121,9 +122,16 @@ def main(argv: list[str] | None = None) -> int:
     from lumur.capture.backends import open_devices
     from lumur.capture.camera import to_gray
     from lumur.capture.loop import CaptureLoop
+    from lumur.cli_errors import CliError
     from lumur.decode.graycode import decode_graycode
     from lumur.patterns.graycode import generate_graycode_sequence
     from lumur.schema.calibration import build_calibration_document, save_calibration
+
+    if args.backend == "sim" and not args.scene:
+        raise CliError(
+            "--scene is required when --backend sim",
+            hint="hint: try --backend sim --scene empty_room",
+        )
 
     devices = open_devices(
         args.backend,
@@ -270,6 +278,12 @@ def main(argv: list[str] | None = None) -> int:
         devices.close()
 
     return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    from lumur.cli_errors import run_cli
+
+    return run_cli(_main, argv)
 
 
 if __name__ == "__main__":

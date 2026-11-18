@@ -83,16 +83,24 @@ def build_parser() -> argparse.ArgumentParser:
     return p
 
 
-def main(argv: list[str] | None = None) -> int:
+def _main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+
+    from lumur.cli_errors import CliError, require_path
 
     if args.ping:
         from lumur.generate.comfy_provider import ComfyUISurfaceGenerator
 
         ping = ComfyUISurfaceGenerator(base_url=args.comfy_url).ping()
         print(json.dumps(ping, indent=2))
-        return 0 if ping.get("ok") else 2
+        if ping.get("ok"):
+            return 0
+        raise CliError(
+            f"ComfyUI unreachable at {args.comfy_url}",
+            hint="hint: start ComfyUI locally, or pass --comfy-url to a reachable host",
+        )
 
+    require_path(args.room_package, kind="room")
     from lumur.generate.pipeline import run_generation
     from lumur.generate.presets import default_presets_dir
 
@@ -121,8 +129,11 @@ def main(argv: list[str] | None = None) -> int:
             scenario_key=args.scenario,
         )
     except (FileNotFoundError, KeyError, ValueError) as exc:
-        print(f"lumur-generate: {exc}", file=sys.stderr)
-        return 1
+        msg = str(exc)
+        hint = None
+        if "comfy" in msg.lower() or "connection" in msg.lower() or "url" in msg.lower():
+            hint = f"hint: is ComfyUI running at {args.comfy_url}?"
+        raise CliError(f"lumur-generate: {exc}", hint=hint, code=1) from exc
 
     summary = job.to_dict()
     # Drop nested request bytes-ish noise.
@@ -138,8 +149,21 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
         return 0
+    err = str(job.error or "")
+    if "connect" in err.lower() or "urlopen" in err.lower() or "refused" in err.lower():
+        raise CliError(
+            f"job {job.job_id} failed: ComfyUI unreachable at {args.comfy_url}",
+            hint="hint: start ComfyUI, then retry",
+            code=3,
+        )
     print(f"job {job.job_id} {job.status.value}: {job.error}", file=sys.stderr)
     return 3
+
+
+def main(argv: list[str] | None = None) -> int:
+    from lumur.cli_errors import run_cli
+
+    return run_cli(_main, argv)
 
 
 if __name__ == "__main__":

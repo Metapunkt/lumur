@@ -28,11 +28,11 @@ package:
 cd companion
 source .venv/bin/activate
 
-# After lumur-scan -o /tmp/sim-room
-lumur-export-godot /tmp/sim-room
+# After lumur-scan -o demo/fixtures/sample_room
+lumur-export-godot demo/fixtures/sample_room
 ```
 
-This writes `/tmp/sim-room/godot/`:
+This writes `demo/fixtures/sample_room/godot/`:
 
 | File | Role |
 | --- | --- |
@@ -49,9 +49,9 @@ ignore unknown keys remain valid.
 Repository root is the Godot project (`project.godot` + `addons/lumur`).
 
 ```bash
-export LUMUR_GODOT_ASSETS=/tmp/sim-room/godot
-godot --path . 
-# or: tools/godot --path .
+export LUMUR_GODOT_ASSETS=$PWD/demo/fixtures/sample_room/godot
+godot --path .
+# or: $GODOT_BIN --path .
 ```
 
 The demo paints `floor` red, `wall_1` blue, and pulses `wall_2` when present.
@@ -65,11 +65,11 @@ canvas shaders. For a real paint PNG, use a virtual display:
 xvfb-run -a godot --path . \
   --display-driver x11 --rendering-driver opengl3 \
   --script res://demo/scripts/headless_paint_render.gd \
-  -- --assets=/tmp/sim-room/godot --out=/tmp/paint.png
+  -- --assets=demo/fixtures/sample_room/godot --out=/tmp/paint.png
 ```
 
-Python tests call the same path when a Godot binary is on `PATH`, at
-`tools/godot`, or in `GODOT_BIN`, and `xvfb-run` is available. If Godot
+Python tests call the same path when a Godot binary is on `PATH` or in
+`GODOT_BIN`, and `xvfb-run` is available. If Godot
 or xvfb is missing, the companion’s **reference painter**
 (`lumur.paint.render`) still verifies mapping and sim colour landing —
 see Limitations.
@@ -89,7 +89,7 @@ GDScript:
 
 ```gdscript
 var runtime: LumurRoomRuntime = $PaintDemo
-runtime.load_room("/tmp/sim-room/godot")
+runtime.load_room("demo/fixtures/sample_room/godot")
 runtime.paint_surface("floor", Color(0.9, 0.2, 0.15))
 runtime.pulse_surface("wall_1", Color(0.2, 0.6, 0.95), 0.8)
 

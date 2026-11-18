@@ -100,6 +100,6 @@ not as “one hard-wired ComfyUI sidecar” or “ComfyUI only via Synesyn.”
 - Trade-off: full byte-identical parity with every Synesyn render field is
   not promised in v1 — only the surface-role and control-image seams
   needed for portable presets.
-- Follow-up: when Accepted, implement the interface and standalone provider
-  before or beside `lumur_synesyn`; add a CI check that `addons/lumur/**`
-  does not import `synesyn_core`.
+- Follow-up done: interface + standalone ComfyUI provider landed with PRD-002
+  slice 1; Hub provider in `lumur_synesyn` (slice 2). Keep `addons/lumur/**`
+  free of `synesyn_core` imports.

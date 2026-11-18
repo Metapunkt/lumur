@@ -24,10 +24,10 @@ through the filtered input bus when running as a packaged app.
 
 ```bash
 # Terminal A — export paint assets if needed
-cd companion && lumur-export-godot /tmp/sim-room
+cd companion && lumur-export-godot ../demo/fixtures/sample_room
 
 # Terminal B — Godot ripple demo
-export LUMUR_GODOT_ASSETS=/tmp/sim-room/godot
+export LUMUR_GODOT_ASSETS=$PWD/demo/fixtures/sample_room/godot
 godot --path . demo/scenes/ripple_demo.tscn
 
 # Terminal C — sim walkers sending UDP events
@@ -72,8 +72,8 @@ Godot `--headless` uses the dummy renderer (no canvas shaders). Prefer
 xvfb-run -a godot --path . \
   --display-driver x11 --rendering-driver opengl3 \
   --script res://demo/scripts/headless_ripple_render.gd \
-  -- --assets=/tmp/sim-room/godot --out=/tmp/ripple.png \
-     --foot=0.0,0.0;0.4,-0.2
+  -- --assets=demo/fixtures/sample_room/godot --out=/tmp/ripple.png \
+     --foot='0.0,0.0;0.4,-0.2'
 ```
 
 ## Graceful degradation

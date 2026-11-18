@@ -31,6 +31,43 @@ Story Stage + steering/replay bridge) and Godot 4 addons
 [`addons/lumur/`](addons/lumur/), optional
 [`addons/lumur_synesyn/`](addons/lumur_synesyn/).
 
+## Sim quickstart (no hardware)
+
+Uses one scene (`empty_room`) end to end. Needs `python3-venv` (Debian/Ubuntu:
+`sudo apt install python3-venv`). Godot 4: download from
+[godotengine.org](https://godotengine.org/download) and put the binary on
+`PATH` as `godot`, or set `GODOT_BIN`. The tape-measure pixels below are for
+the **64×48 projector / 80×60 camera** sim presets.
+
+```bash
+# 1) Companion
+cd companion
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
+
+lumur-calibrate --backend sim --scene empty_room \
+  --distance-m 1.08 --point-a 31.2,17.2 --point-b 49.0,22.1 \
+  -o ../demo/fixtures/sample_room/calibration.json
+lumur-scan --backend sim --scene empty_room \
+  --calibration ../demo/fixtures/sample_room/calibration.json \
+  -o ../demo/fixtures/sample_room
+lumur-export-godot ../demo/fixtures/sample_room
+
+# Or skip capture and use the committed fixture:
+#   demo/fixtures/sample_room/godot/
+
+# 2) Godot (from repo root)
+export LUMUR_GODOT_ASSETS="$PWD/demo/fixtures/sample_room/godot"
+godot --path . demo/scenes/paint_demo.tscn   # or ripple_demo.tscn
+
+# 3) Bundled apps (headless fit check)
+lumur-app check ../apps/paint/lumur.app.json
+lumur-app fit ../apps/paint/lumur.app.json --room ../demo/fixtures/sample_room
+lumur-app fit ../apps/ripples/lumur.app.json --room ../demo/fixtures/sample_room
+```
+
+Keep calibrate and scan on the **same** `--scene`. A mismatch prints a warning.
+
 ## Documentation
 
 Start at [`docs/`](docs/README.md). Calibration:
@@ -57,9 +94,9 @@ Session / Story Log replay:
 
 © 2026 “Lumur” by Ayodele Arigbabu
 
-Source code is MIT. Text, documentation, and other website material are
-[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). See
-[`LICENSE`](LICENSE).
+**Dual licence:** source code is [MIT](LICENSE); documentation and other text
+are [CC BY-SA 4.0](LICENSE-docs)
+([summary](https://creativecommons.org/licenses/by-sa/4.0/)).
 
 ## Credits
 

@@ -57,6 +57,12 @@ func list_surfaces() -> Array:
 	return manifest.get("surfaces", [])
 
 
+func list_roles() -> Array:
+	var keys: Array = _role_index.keys()
+	keys.sort()
+	return keys
+
+
 func resolve_surface_id(key: Variant) -> int:
 	## Accept an int id, or a role/label string (``floor``, ``wall_1``, …).
 	if typeof(key) == TYPE_INT:

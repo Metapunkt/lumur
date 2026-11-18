@@ -28,8 +28,8 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help=(
             "sim scene JSON/YAML path or preset name "
-            "(empty_room, room_with_box, noisy_room); required for --backend sim "
-            "when capturing live"
+            "(empty_room, room_with_box, noisy_room, room_with_walkers); "
+            "required for --backend sim when capturing live"
         ),
     )
     p.add_argument("--camera", default="0", help="camera index or device path")
@@ -135,13 +135,16 @@ def _apply_sim_gt_pose(calibration: dict, rig) -> dict:
     return doc
 
 
-def main(argv: list[str] | None = None) -> int:
+def _main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
 
+    from lumur.cli_errors import require_path, warn_scene_mismatch
     from lumur.schema.calibration import load_calibration
     from lumur.scan.pipeline import scan_from_correspondence, write_scan_package
 
+    require_path(args.calibration, kind="calibration")
     calibration = load_calibration(args.calibration)
+    warn_scene_mismatch(calibration, args.scene)
     devices = None
     corr = None
 
@@ -253,6 +256,12 @@ def main(argv: list[str] | None = None) -> int:
             devices.close()
 
     return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    from lumur.cli_errors import run_cli
+
+    return run_cli(_main, argv)
 
 
 if __name__ == "__main__":

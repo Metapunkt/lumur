@@ -75,8 +75,8 @@ class SynesynHubClient:
         obj = json.loads(raw) if raw else {}
         if not isinstance(obj, dict):
             raise HubError(f"invalid JSON object from {url}")
-        # Some Hub paths return ok:false with 200; surface that.
-        if obj.get("ok") is False and code >= 400:
+        # Some Hub paths return ok:false with HTTP 200; treat as failure.
+        if obj.get("ok") is False:
             raise HubError(str(obj.get("error") or obj))
         return obj
 
