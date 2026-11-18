@@ -23,8 +23,11 @@ Reference material both audiences reach for eventually.
 | [Product requirements](product-requirements/README.md) | What problem is this solving, and how is success measured? |
 | [Architectural decisions](architectural-decisions/README.md) | Why is it built this way? Append-only, including the decisions we reversed. |
 
-User guides, a developer guide, implementation contracts and harness specs will
-appear here when there is software to describe.
+Companion calibration (Gray-code driver, JSON schema, live webcam/projector
+runbook): [companion/calibration.md](companion/calibration.md).
+
+Further user guides, a developer guide, and implementation contracts will
+appear here as the runtime grows.
 
 ## Credit and licence
 
