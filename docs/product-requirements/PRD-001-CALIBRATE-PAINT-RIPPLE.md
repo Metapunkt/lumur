@@ -2,7 +2,7 @@
 id: PRD-001
 title: Calibrate, paint the room, and footstep ripples
 status: draft
-version: "0.1"
+version: "0.2"
 owner: Ayodele Arigbabu
 last_reviewed: 2026-11-18
 primary_users: [installer, author, visitor]
@@ -114,6 +114,11 @@ exists, not in a second copy of this journey.
   depend on that scale.
 - **REQ-001-004:** A room scan must retain per-region confidence and must
   not emit unsupported triangles that bridge unobserved gaps.
+  **Status (2026-11-18):** Companion slice implemented — dense triangulation
+  with per-pixel confidence/masks, RANSAC floor/wall planes, and a versioned
+  `lumur.room` package ([room-scan.md](../companion/room-scan.md),
+  [ADR 0012](../architectural-decisions/0012-versioned-room-package.md)).
+  Godot mesh consumption and paint-the-room remain later work.
 - **REQ-001-005:** A paint-the-room mode must transfer appearance from
   camera space to projector space through the scanned correspondence,
   without requiring an authored 3D model.
@@ -133,10 +138,17 @@ exists, not in a second copy of this journey.
 
 ## Acceptance
 
-Automated coverage: none yet. Lumur is in design phase and has no
-harness.
+Automated coverage (companion, simulated rig):
 
-Manual coverage, when implementation begins:
+- Gray-code decode, plane calibration, and residual reporting against
+  sim ground truth (REQ-001-001, REQ-001-002, REQ-001-003) —
+  `companion/tests/test_sim_e2e.py`.
+- Room scan depth/point accuracy (relative ray-depth tolerances at preset
+  resolution), floor plane recovery, wall planes, box as non-planar or
+  extra surfaces, noisy_room degraded-but-sane confidence
+  (REQ-001-004) — `companion/tests/test_room_scan.py`.
+
+Manual coverage, when hardware or Godot slices begin:
 
 - Projected grid alignment at centre and edges, with residual report
   including worst region (REQ-001-001, REQ-001-002).
@@ -161,8 +173,12 @@ Manual coverage, when implementation begins:
 - [ADR 0005: pose on the raw frame, subtraction as a mask](../architectural-decisions/0005-pose-and-predicted-frame-subtraction.md)
 - [ADR 0006: runtime for rooms](../architectural-decisions/0006-room-as-os-runtime.md)
 - [ADR 0008: ComfyUI is asynchronous and optional](../architectural-decisions/0008-comfyui-asynchronous.md)
+- [ADR 0011: simulated projector–camera rig](../architectural-decisions/0011-simulated-projector-camera-rig.md)
+- [ADR 0012: versioned room package](../architectural-decisions/0012-versioned-room-package.md)
 
-No implementation contracts yet.
+Companion runbooks: [calibration.md](../companion/calibration.md),
+[room-scan.md](../companion/room-scan.md),
+[simulation.md](../companion/simulation.md).
 
 ## Open questions and risks
 
@@ -183,9 +199,12 @@ No implementation contracts yet.
 
 ## Evidence map
 
-- User workflow: not yet written
-- Normative contract: not yet written
-- Architectural decisions: ADR 0002, 0003, 0004, 0005, 0006, 0008
+- User workflow: [calibration.md](../companion/calibration.md),
+  [room-scan.md](../companion/room-scan.md)
+- Normative contract: `lumur.calibration` v1.0 and `lumur.room` v1.0
+  schemas (documented in the runbooks; ADR 0012)
+- Architectural decisions: ADR 0002, 0003, 0004, 0005, 0006, 0008, 0011, 0012
 - Implementation tracker: none
-- Executable specification: none
+- Executable specification: `companion/tests/test_sim_e2e.py`,
+  `companion/tests/test_room_scan.py`
 - Founding notes: [scratchpad](../scratchpad.md)

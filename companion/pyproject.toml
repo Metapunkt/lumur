@@ -19,6 +19,7 @@ dev = ["pytest>=7.4"]
 
 [project.scripts]
 lumur-calibrate = "lumur.cli:main"
+lumur-scan = "lumur.cli_scan:main"
 
 [tool.setuptools.packages.find]
 include = ["lumur*"]
