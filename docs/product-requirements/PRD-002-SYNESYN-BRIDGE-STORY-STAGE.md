@@ -1,8 +1,8 @@
 ---
 id: PRD-002
 title: Surface generation, Synesyn bridge, and Story Stage on Lumur
-status: draft
-version: "0.2"
+status: complete-in-sim
+version: "0.3"
 owner: Ayodele Arigbabu
 last_reviewed: 2026-11-18
 primary_users: [installer, author, visitor, workshop facilitator]
@@ -260,8 +260,14 @@ tab, Story Catalyst, Story Stage). This PRD does not duplicate them.
   Absent that section, `presence`, `zone_enter`, `zone_leave`,
   `gathering`, and `footstep` events must not advance story / director
   state.
+  **Status (slice 4):** complete-in-sim — `lumur_audience` /
+  `LumurAudienceConfig` + `AudienceSteeringBridge`; opt-out scenarios
+  never produce steered actions. See
+  [audience-steering.md](../bridge/audience-steering.md).
 - **REQ-002-012:** Regardless of steering opt-in, the runtime may use
   presence and footsteps for ambience and for PRD-001 ripples.
+  **Status (slice 4):** complete-in-sim — ambience forwarding always;
+  ripples unchanged from PRD-001.
 - **REQ-002-013:** Event vocabulary (companion → Lumur → bridge), stable
   for this PRD:
 
@@ -277,20 +283,25 @@ tab, Story Catalyst, Story Stage). This PRD does not duplicate them.
   bridge into the metaprompt / host path (for example as staged cues or
   director hints). Exact prompt wording is scenario-owned; Lumur owns the
   event schema and delivery.
+  **Status (slice 4):** complete-in-sim — `lumur.audience` detector +
+  ADR 0014 UDP; dwell / debounce reject passers-by; metaprompt summary
+  via `audience_state_for_metaprompt`.
 
 ### Provenance and replay
 
 - **REQ-002-014:** When the Hub provider or Story Stage bridge is active,
   the current room package (`lumur.room` and Godot paint export) must be
   registerable as a Hub artifact so spatial setup carries provenance.
-  **Status (slice 2):** complete-in-sim — `register_room_package` posts
-  `json.lumur_room` via Hub `POST /substrate/artifacts` (generic API).
-  Official type documentation remains a Synesyn-side touchpoint; Story
-  Stage / Story Log replay stays slice 4.
+  **Status (slice 4):** complete-in-sim — `register_room_package`
+  (`json.lumur_room`) + `register_session_with_hub`
+  (`json.lumur_session`) against mock Hub.
 - **REQ-002-015:** A Story Log plus its provenance sidecar, together with
   the registered room package, must be sufficient to replay dialogue and
   surface layout in the Lumur sim without live models or hardware
   (playback host pattern analogous to Synesyn’s story-log player).
+  **Status (slice 4):** complete-in-sim — `lumur.session` recording +
+  `replay_session` re-drives Story Stage stub and paint digests
+  identically. See [replay.md](../bridge/replay.md).
 
 ### Verification
 
@@ -299,13 +310,12 @@ tab, Story Catalyst, Story Stage). This PRD does not duplicate them.
   xvfb), using a ComfyUI stub for standalone generation and a Synesyn Hub
   mock for bridge behaviour. Physical hardware validation is explicitly
   deferred.
-  **Status (slice 3):** complete-in-sim for REQs 001–010, 014 (room
-  registration) —
+  **Status (slice 4):** complete-in-sim for REQs 001–016 —
   `companion/tests/test_generate_comfyui.py` +
   `companion/tests/test_generate_synesyn_hub.py` (mock Hub) +
-  `companion/tests/test_story_stage_surfaces.py` (stub Story Stage →
-  layout → paint → sim). Audience steering / Story Log replay remain
-  slice 4.
+  `companion/tests/test_story_stage_surfaces.py` +
+  `companion/tests/test_audience_steering.py` (opt-in / debounce /
+  walking figures / replay / Story Stage mock).
 
 ## Acceptance
 
@@ -324,9 +334,10 @@ Automated (target, as slices land):
   `companion/tests/test_story_stage_surfaces.py` (stub source).
 - Steering off by default; with `[LUMUR_AUDIENCE]` (or agreed name),
   injected zone/gathering events affect a test host; without it, they do
-  not (REQ-002-011–013).
+  not (REQ-002-011–013) —
+  `companion/tests/test_audience_steering.py`.
 - Room package artifact registration + Story Log replay in sim
-  (REQ-002-014–015).
+  (REQ-002-014–015) — same test module + mock Hub session registration.
 - No live projector/webcam required for complete-in-sim (REQ-002-016).
 
 Manual (later hardware / live Synesyn):
@@ -385,17 +396,19 @@ Synesyn code change is required**; Lumur adapts at the bridge boundary.
 ## Open questions and risks
 
 - Exact name and schema of the audience-steering scenario section
-  (`[LUMUR_AUDIENCE]` vs a field inside an existing section) — agree with
-  Synes-bot before slice 4.
-- How aggressive gathering detection should be (count threshold, dwell
-  time, zone vs proximity cluster).
+  (`[LUMUR_AUDIENCE]` vs a field inside an existing section) — working
+  name locked as `lumur_audience` / `[LUMUR_AUDIENCE]` for slice 4;
+  Synesyn loader whitelist remains a fork touchpoint.
+- Gathering defaults (count ≥ 2, dwell 1.5 s, zone + proximity cluster)
+  are configurable per scenario; hardware tuning still open.
 - Whether standalone Lumur presets live as on-disk JSON in the room
   package / a presets directory, or as a small Godot resource format;
   alignment with `json.workflow` should favour easy export into SynPunkt.
 - Whether mask / depth / normal uploads are required for v1 presets or
   only for advanced ones; v1 should tolerate presets that need none.
 - Room-package Hub artifact: wrap the whole directory (archive) vs
-  register `room.json` + key arrays as related artifacts.
+  register `room.json` + key arrays as related artifacts (slice 2/4 uses
+  `room.json` + paint summary via `json.lumur_room`).
 - Godot minor alignment: Lumur demo is on 4.3; Synesyn Story Stage targets
   4.7 features for some motion rungs — bridge must degrade when host Godot
   is older.
@@ -410,17 +423,16 @@ Synesyn code change is required**; Lumur adapts at the bridge boundary.
   [tracking.md](../companion/tracking.md),
   [ripples.md](../godot/ripples.md); Synesyn SynPunkt / Story Stage /
   Story Catalyst guides (upstream)
-- Normative contract: [comfyui.md](../companion/comfyui.md) (slice 1
-  generator / presets); `lumur.event` extensions for presence / zones
-  (later slices); `SynesynRenderRequestV1` (upstream, slice 2+)
-- Architectural decision: ADR 0008, 0009, 0015, 0016
-- Implementation tracker: slice 1 in companion `lumur.generate` +
-  `addons/lumur` paint texture path; slice 2 in `lumur_synesyn` +
-  `addons/lumur_synesyn` ([bridge/synesyn.md](../bridge/synesyn.md));
-  slice 3 Story Stage layout
-  ([bridge/story-stage.md](../bridge/story-stage.md))
-- Executable specification: `companion/tests/test_generate_comfyui.py`
-  (slice 1); `companion/tests/test_generate_synesyn_hub.py` (slice 2 Hub
-  mock); `companion/tests/test_story_stage_surfaces.py` (slice 3 stub →
-  paint → sim)
+- Normative contract: [comfyui.md](../companion/comfyui.md);
+  [synesyn.md](../bridge/synesyn.md); [story-stage.md](../bridge/story-stage.md);
+  [audience-steering.md](../bridge/audience-steering.md);
+  [replay.md](../bridge/replay.md); `lumur.event` presence / zones;
+  `SynesynRenderRequestV1` (upstream)
+- Architectural decision: ADR 0008, 0009, 0014, 0015, 0016
+- Implementation tracker: `lumur.generate`, `lumur.audience`,
+  `lumur_synesyn` (Hub + Story Stage + audience + replay),
+  `addons/lumur` + `addons/lumur_synesyn`
+- Executable specification: `companion/tests/test_generate_comfyui.py`,
+  `test_generate_synesyn_hub.py`, `test_story_stage_surfaces.py`,
+  `test_audience_steering.py`
 - Founding notes: [scratchpad](../scratchpad.md)

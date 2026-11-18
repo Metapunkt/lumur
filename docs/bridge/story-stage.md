@@ -6,8 +6,9 @@ all Story Stage code lives in the optional `lumur_synesyn` bridge
 ([ADR 0009](../architectural-decisions/0009-standalone-with-synesyn-bridge.md),
 [ADR 0015](../architectural-decisions/0015-single-lumur-synesyn-bridge.md)).
 
-Hub generation (slice 2): [synesyn.md](synesyn.md). Audience steering and
-Story Log replay are slice 4 — not in this document.
+Hub generation (slice 2): [synesyn.md](synesyn.md). Audience steering:
+[audience-steering.md](audience-steering.md). Story Log / session replay:
+[replay.md](replay.md).
 
 ## What lands where
 

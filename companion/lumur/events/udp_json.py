@@ -1,8 +1,8 @@
 """Lean local UDP JSON event bus (ADR 0014).
 
-Companion sends footstep (and later presence) events as one JSON object per
-datagram. Godot listens with PacketPeerUDP. No framing, no TLS — loopback /
-LAN only for the first milestone.
+Companion sends footstep / presence / zone / gathering events as one JSON
+object per datagram. Godot listens with PacketPeerUDP. No framing, no TLS —
+loopback / LAN only for the first milestone.
 """
 
 from __future__ import annotations
@@ -54,6 +54,13 @@ class EventSender:
         self._sock.sendto(encode_event(payload), (self.host, self.port))
 
     def send_footstep(self, event: Any) -> None:
+        if hasattr(event, "to_dict"):
+            self.send(event.to_dict())
+        else:
+            self.send(dict(event))
+
+    def send_audience(self, event: Any) -> None:
+        """Send presence / zone_enter / zone_leave / gathering (or footstep)."""
         if hasattr(event, "to_dict"):
             self.send(event.to_dict())
         else:

@@ -16,16 +16,18 @@ room.
 **Status:** [PRD-001](docs/product-requirements/PRD-001-CALIBRATE-PAINT-RIPPLE.md)
 is **complete-in-sim** (calibrate → scan → paint → footstep ripples against
 the simulated projector–camera rig). [PRD-002](docs/product-requirements/PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md)
-**slices 1–3** are complete-in-sim: standalone ComfyUI generation, optional
-Synesyn Hub bridge, and Story Stage layer→surface mapping (`lumur_synesyn`),
-all against mocks / stubs. Hardware validation is still pending. Founding
-intent: [scratchpad](docs/scratchpad.md),
+is **complete-in-sim** (slices 1–4): standalone ComfyUI generation, optional
+Synesyn Hub bridge, Story Stage layer→surface mapping, opt-in audience
+steering, and Story Log / session replay (`lumur_synesyn`), all against
+mocks / stubs. Hardware validation is still pending. Founding intent:
+[scratchpad](docs/scratchpad.md),
 [ADRs](docs/architectural-decisions/README.md),
 [PRDs](docs/product-requirements/README.md).
 
 Code: Python companion [`companion/`](companion/) (calibrate, sim, room scan,
-paint export, tracking, ComfyUI generation, optional Hub + Story Stage bridge)
-and Godot 4 addons [`addons/lumur/`](addons/lumur/), optional
+paint export, tracking, audience events, ComfyUI generation, optional Hub +
+Story Stage + steering/replay bridge) and Godot 4 addons
+[`addons/lumur/`](addons/lumur/), optional
 [`addons/lumur_synesyn/`](addons/lumur_synesyn/).
 
 ## Documentation
@@ -39,6 +41,10 @@ Start at [`docs/`](docs/README.md). Calibration:
 [`docs/companion/comfyui.md`](docs/companion/comfyui.md). Optional Synesyn
 Hub bridge: [`docs/bridge/synesyn.md`](docs/bridge/synesyn.md). Story Stage
 on surfaces: [`docs/bridge/story-stage.md`](docs/bridge/story-stage.md).
+Audience steering:
+[`docs/bridge/audience-steering.md`](docs/bridge/audience-steering.md).
+Session / Story Log replay:
+[`docs/bridge/replay.md`](docs/bridge/replay.md).
 
 ## Licence
 

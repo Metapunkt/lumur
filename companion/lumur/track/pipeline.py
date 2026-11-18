@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 import numpy as np
 
@@ -11,6 +11,10 @@ from lumur.track.footsteps import FootstepDetector, FootstepEvent
 from lumur.track.pose import DetectedPerson, PoseDetector
 from lumur.track.subtraction import PredictedFrameSubtractor, SubtractionResult
 from lumur.track.tracker import PersonTrack, SimpleByteTracker
+
+if TYPE_CHECKING:
+    from lumur.audience.detector import AudienceDetector
+    from lumur.audience.events import AudienceEvent
 
 
 @dataclass
@@ -22,6 +26,7 @@ class TrackingResult:
     subtraction: SubtractionResult | None
     timestamp: float
     rejected_count: int = 0
+    audience_events: list[Any] = field(default_factory=list)
 
 
 @dataclass
@@ -32,10 +37,12 @@ class TrackingPipeline:
     tracker: SimpleByteTracker
     footstep_detector: FootstepDetector
     subtractor: PredictedFrameSubtractor | None = None
+    audience_detector: Any | None = None  # AudienceDetector | None
     min_ankle_keep: int = 1  # ankles that must survive the mask
     timestamp: float = 0.0
     frame_dt: float = 1.0 / 30.0
     events: list[FootstepEvent] = field(default_factory=list)
+    audience_events: list[Any] = field(default_factory=list)
 
     def push_projector_frame(self, pattern: np.ndarray | None) -> None:
         if self.subtractor is not None:
@@ -115,6 +122,15 @@ class TrackingPipeline:
         tracks = self.tracker.update(filtered)
         footsteps = self.footstep_detector.update(tracks, float(timestamp))
         self.events.extend(footsteps)
+        audience_events: list[Any] = []
+        if self.audience_detector is not None:
+            audience_events = self.audience_detector.update(
+                tracks,
+                float(timestamp),
+                footstep_detector=self.footstep_detector,
+                footsteps=footsteps,
+            )
+            self.audience_events.extend(audience_events)
         return TrackingResult(
             detections=detections,
             filtered_detections=filtered,
@@ -123,11 +139,13 @@ class TrackingPipeline:
             subtraction=subtraction,
             timestamp=float(timestamp),
             rejected_count=rejected,
+            audience_events=audience_events,
         )
 
     def metrics(self) -> dict[str, Any]:
         return {
             "footstep_count": len(self.events),
+            "audience_event_count": len(self.audience_events),
             "active_tracks": len(self.tracker.tracks),
             "timestamp": self.timestamp,
         }

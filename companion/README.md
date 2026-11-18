@@ -95,6 +95,18 @@ pytest tests/test_story_stage_surfaces.py
 
 See [docs/bridge/story-stage.md](../docs/bridge/story-stage.md).
 
+## Audience steering + session replay (slice 4)
+
+Opt-in per scenario (`lumur_audience`). Core emits presence / zone /
+gathering; the bridge steers Story Stage only when opted in.
+
+```bash
+pytest tests/test_audience_steering.py
+```
+
+See [docs/bridge/audience-steering.md](../docs/bridge/audience-steering.md) and
+[docs/bridge/replay.md](../docs/bridge/replay.md).
+
 ## Live calibration and scan
 
 See [docs/companion/calibration.md](../docs/companion/calibration.md) and

@@ -4,14 +4,12 @@ Pick the documentation pathway that best describes your needs.
 
 ## I want to understand the project
 
-Lumur is in design phase; there is no software to install yet.
-
 - [Scratchpad](scratchpad.md) — the founding brainstorm, dated 2026-11-18,
   including the naming journey and open questions.
 - [Product requirements](product-requirements/README.md) — what each
   milestone must do, and how success is measured ([PRD-001](product-requirements/PRD-001-CALIBRATE-PAINT-RIPPLE.md)
-  complete-in-sim; [PRD-002](product-requirements/PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md)
-  draft: generation, Synesyn bridge, Story Stage).
+  and [PRD-002](product-requirements/PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md)
+  complete-in-sim).
 - [Architectural decisions](architectural-decisions/README.md) — why it is
   built this way. Append-only, including the decisions we reverse.
 
@@ -52,13 +50,11 @@ Optional Synesyn Hub bridge (`lumur_synesyn`, PRD-002 slice 2):
 Story Stage layers on room surfaces (PRD-002 slice 3):
 [bridge/story-stage.md](bridge/story-stage.md).
 
-Next product intent (audience steering + Story Log replay — PRD-002 slice 4):
-[PRD-002](product-requirements/PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md),
-[ADR 0015](architectural-decisions/0015-single-lumur-synesyn-bridge.md),
-[ADR 0016](architectural-decisions/0016-pluggable-surface-generators.md).
+Opt-in audience steering (PRD-002 slice 4):
+[bridge/audience-steering.md](bridge/audience-steering.md).
 
-Further user guides, a developer guide, and implementation contracts will
-appear here as the runtime grows.
+Session / Story Log replay (PRD-002 slice 4):
+[bridge/replay.md](bridge/replay.md).
 
 ## Credit and licence
 

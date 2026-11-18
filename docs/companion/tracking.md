@@ -19,7 +19,12 @@ mask, multi-person tracking, and ankle→floor footstep events
 6. **Track** with a lightweight ByteTrack-style associator (stable ids).
 7. **Footsteps:** ray-cast ankles through the camera onto the scanned floor
    plane; emit events on contact heuristics.
-8. **Send** events as local UDP JSON to Godot (default `127.0.0.1:8765`).
+8. **Audience (optional):** project tracks onto floor u/v; emit `presence`,
+   `zone_enter` / `zone_leave`, and `gathering` for named floor zones
+   ([PRD-002](../product-requirements/PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md)
+   slice 4). Story steering is **not** here — see
+   [audience-steering.md](../bridge/audience-steering.md).
+9. **Send** events as local UDP JSON to Godot (default `127.0.0.1:8765`).
 
 ## Quick start (sim)
 
@@ -93,16 +98,38 @@ do not erase real ankles.
 Transport envelope: see [ADR 0014](../architectural-decisions/0014-udp-json-event-transport.md)
 and [ripples.md](../godot/ripples.md).
 
+## Audience events
+
+Core package `lumur.audience` derives presence / zone / gathering from the
+same floor frame. Attach an `AudienceDetector` to `TrackingPipeline`:
+
+```python
+from lumur.audience import AudienceDetector, FloorZone
+from lumur.track import TrackingPipeline
+
+zones = [FloorZone.rect("left", -1.0, -0.2, 0.2, 0.9)]
+pipeline = TrackingPipeline(
+    ...,
+    audience_detector=AudienceDetector(zones=zones),
+)
+# result.audience_events → presence / zone_enter / …
+```
+
+These events always may drive ambience and ripples. Mapping them onto
+Story Stage beats / choices requires an opted-in `lumur_audience` scenario
+section in the bridge.
+
 ## Tests
 
 ```bash
 cd companion
-pytest tests/test_tracking.py -q
+pytest tests/test_tracking.py tests/test_audience_steering.py -q
 ```
 
 Coverage: radiometric fit, prediction accuracy, silhouette rejection,
 stable IDs for 2–4 crossing walkers, footstep position tolerance, UDP e2e
-into a Python mock of the Godot receiver.
+into a Python mock of the Godot receiver; audience opt-in / debounce /
+replay via the bridge tests.
 
 ## Limitations
 
