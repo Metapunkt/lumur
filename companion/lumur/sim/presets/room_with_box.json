@@ -1,0 +1,52 @@
+{
+  "name": "room_with_box",
+  "seed": 1,
+  "room": {
+    "type": "axis",
+    "width": 4.0,
+    "depth": 4.0,
+    "height": 2.5,
+    "floor_albedo": 0.65,
+    "wall_albedo": 0.8,
+    "include_side_walls": true,
+    "include_ceiling": false,
+    "boxes": [
+      {
+        "name": "crate",
+        "center": [0.55, 0.25, 0.9],
+        "size": [0.5, 0.5, 0.5],
+        "albedo": 0.45
+      }
+    ],
+    "occupants": [
+      {
+        "name": "placeholder_person",
+        "center": [-0.7, 0.0, 1.1],
+        "height": 1.6,
+        "radius": 0.22,
+        "albedo": 0.3
+      }
+    ]
+  },
+  "projector": {
+    "width": 64,
+    "height": 48,
+    "eye": [0.3, 1.45, -1.55],
+    "target": [0.0, 0.55, 1.15],
+    "fov_y_deg": 40.0,
+    "gamma": 2.2
+  },
+  "camera": {
+    "width": 80,
+    "height": 60,
+    "eye": [-0.05, 1.15, -1.75],
+    "target": [0.0, 0.5, 1.05],
+    "fov_y_deg": 55.0,
+    "distortion": [0.015, -0.008, 0.0, 0.0, 0.0],
+    "exposure": 1.0,
+    "noise_std": 0.0,
+    "ambient": 5.0,
+    "blur_sigma": 0.0,
+    "seed": 1
+  }
+}

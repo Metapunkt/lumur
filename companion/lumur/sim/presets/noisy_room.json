@@ -1,0 +1,35 @@
+{
+  "name": "noisy_room",
+  "seed": 7,
+  "room": {
+    "type": "axis",
+    "width": 4.0,
+    "depth": 4.0,
+    "height": 2.5,
+    "floor_albedo": 0.68,
+    "wall_albedo": 0.82,
+    "include_side_walls": true,
+    "include_ceiling": false
+  },
+  "projector": {
+    "width": 64,
+    "height": 48,
+    "eye": [0.22, 1.35, -1.6],
+    "target": [0.0, 0.55, 1.2],
+    "fov_y_deg": 42.0,
+    "gamma": 2.2
+  },
+  "camera": {
+    "width": 80,
+    "height": 60,
+    "eye": [0.0, 1.2, -1.8],
+    "target": [0.0, 0.5, 1.0],
+    "fov_y_deg": 55.0,
+    "distortion": [0.02, -0.01, 0.0, 0.0, 0.0],
+    "exposure": 1.05,
+    "noise_std": 8.0,
+    "ambient": 18.0,
+    "blur_sigma": 0.6,
+    "seed": 7
+  }
+}

@@ -82,6 +82,19 @@ Dense correspondence (when requested) is stored beside the JSON as an
 shaped like the camera image. Invalid pixels have `valid == false` and
 `confidence == 0`.
 
+## Simulated hardware
+
+When a webcam and projector are unavailable, use the simulated rig
+([simulation.md](simulation.md), [ADR 0011](../architectural-decisions/0011-simulated-projector-camera-rig.md)):
+
+```bash
+lumur-calibrate \
+  --backend sim --scene empty_room \
+  --distance-m 1.08 \
+  --point-a 31.2,17.2 --point-b 49.0,22.1 \
+  -o /tmp/sim-calibration.json
+```
+
 ## What this slice does not do
 
 Godot rendering, room meshing, paint-the-room, and footstep ripples are

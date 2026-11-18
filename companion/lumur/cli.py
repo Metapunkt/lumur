@@ -13,21 +13,46 @@ def build_parser() -> argparse.ArgumentParser:
         prog="lumur-calibrate",
         description=(
             "Run Gray-code structured-light calibration between a webcam and "
-            "a projector. Patterns are shown fullscreen via OpenCV (ADR 0010)."
+            "a projector. Patterns are shown fullscreen via OpenCV (ADR 0010) "
+            "or through the simulated rig (ADR 0011)."
+        ),
+    )
+    p.add_argument(
+        "--backend",
+        choices=("opencv", "sim"),
+        default="opencv",
+        help="device backend: real OpenCV camera/display, or simulated rig",
+    )
+    p.add_argument(
+        "--scene",
+        default=None,
+        help=(
+            "sim scene JSON/YAML path or preset name "
+            "(empty_room, room_with_box, noisy_room); required for --backend sim"
         ),
     )
     p.add_argument("--camera", default="0", help="camera index or device path")
     p.add_argument("--camera-width", type=int, default=None)
     p.add_argument("--camera-height", type=int, default=None)
-    p.add_argument("--projector-width", type=int, required=True)
-    p.add_argument("--projector-height", type=int, required=True)
+    p.add_argument(
+        "--projector-width",
+        type=int,
+        default=None,
+        help="projector width (required for opencv; defaults from scene for sim)",
+    )
+    p.add_argument(
+        "--projector-height",
+        type=int,
+        default=None,
+        help="projector height (required for opencv; defaults from scene for sim)",
+    )
     p.add_argument(
         "--monitor",
         type=int,
         default=1,
         help="display index hint for the projector (OpenCV moveWindow)",
     )
-    p.add_argument("--settle-ms", type=int, default=200)
+    p.add_argument("--settle-ms", type=int, default=None, help="default 200 (opencv) or 0 (sim)")
     p.add_argument("--contrast-threshold", type=float, default=15.0)
     p.add_argument(
         "--output",
@@ -93,31 +118,62 @@ def main(argv: list[str] | None = None) -> int:
         calibrate_plane_with_measured_distance,
         calibrate_with_checkerboard,
     )
-    from lumur.capture.camera import OpenCVCamera, to_gray
-    from lumur.capture.display import OpenCVFullscreenDisplay
+    from lumur.capture.backends import open_devices
+    from lumur.capture.camera import to_gray
     from lumur.capture.loop import CaptureLoop
     from lumur.decode.graycode import decode_graycode
     from lumur.patterns.graycode import generate_graycode_sequence
     from lumur.schema.calibration import build_calibration_document, save_calibration
 
-    device = _parse_device(args.camera)
-    camera = OpenCVCamera(device, width=args.camera_width, height=args.camera_height)
-    lock = camera.lock_exposure_and_wb()
-    display = OpenCVFullscreenDisplay(monitor_index=args.monitor)
+    devices = open_devices(
+        args.backend,
+        camera=_parse_device(args.camera),
+        camera_width=args.camera_width,
+        camera_height=args.camera_height,
+        monitor_index=args.monitor,
+        scene=args.scene,
+    )
+    lock = devices.lock_exposure_and_wb()
+
+    if args.projector_width is None or args.projector_height is None:
+        if devices.projector_size is None:
+            print(
+                "--projector-width and --projector-height are required "
+                "unless --backend sim provides them via --scene",
+                file=sys.stderr,
+            )
+            devices.close()
+            return 2
+        proj_w, proj_h = devices.projector_size
+    else:
+        proj_w, proj_h = args.projector_width, args.projector_height
+        if devices.projector_size is not None and devices.projector_size != (
+            proj_w,
+            proj_h,
+        ):
+            print(
+                f"warning: --projector size {proj_w}x{proj_h} differs from scene "
+                f"{devices.projector_size[0]}x{devices.projector_size[1]}; "
+                f"using CLI values for pattern generation",
+                file=sys.stderr,
+            )
+
+    settle_ms = args.settle_ms
+    if settle_ms is None:
+        settle_ms = 0 if args.backend == "sim" else 200
 
     try:
-        sequence = generate_graycode_sequence(
-            args.projector_width, args.projector_height
-        )
+        sequence = generate_graycode_sequence(proj_w, proj_h)
         loop = CaptureLoop(
-            camera,
-            display,
-            settle_s=args.settle_ms / 1000.0,
+            devices.camera,
+            devices.display,
+            settle_s=settle_ms / 1000.0,
             validate_identity=not args.skip_identity_check,
+            discard_warmup_grabs=0 if args.backend == "sim" else 1,
         )
         print(
             f"projecting {len(sequence.frames)} Gray-code frames "
-            f"({args.projector_width}x{args.projector_height})…",
+            f"({proj_w}x{proj_h}) via backend={args.backend}…",
             file=sys.stderr,
         )
         captures = loop.capture_sequence(sequence)
@@ -131,15 +187,12 @@ def main(argv: list[str] | None = None) -> int:
 
         cam_w = captures[0].image.shape[1]
         cam_h = captures[0].image.shape[0]
-        projector_size = (args.projector_width, args.projector_height)
+        projector_size = (proj_w, proj_h)
 
         if args.board:
             cols_s, rows_s = args.board.lower().split("x")
             board_size = (int(cols_s), int(rows_s))
-            # Fresh grab of the board under ambient / last pattern — caller
-            # should illuminate the board; use the last capture as a stand-in
-            # only when a dedicated board image is unavailable.
-            board_image = to_gray(camera.grab())
+            board_image = to_gray(devices.camera.grab())
             result = calibrate_with_checkerboard(
                 corr,
                 board_image,
@@ -155,6 +208,11 @@ def main(argv: list[str] | None = None) -> int:
                     file=sys.stderr,
                 )
                 return 2
+            calib_kwargs = {}
+            if devices.rig is not None:
+                # Prefer true camera intrinsics when running against the sim.
+                calib_kwargs["camera_matrix"] = devices.rig.scene.camera.K
+                calib_kwargs["camera_distortion"] = devices.rig.scene.camera.distortion
             result = calibrate_plane_with_measured_distance(
                 corr,
                 camera_size=(cam_w, cam_h),
@@ -162,18 +220,26 @@ def main(argv: list[str] | None = None) -> int:
                 point_a_cam=_parse_uv(args.point_a),
                 point_b_cam=_parse_uv(args.point_b),
                 distance_m=args.distance_m,
+                **calib_kwargs,
             )
+
+        notes = {
+            "backend": args.backend,
+            "camera_lock": {
+                "exposure_locked": bool(getattr(lock, "exposure_locked", False)),
+                "white_balance_locked": bool(
+                    getattr(lock, "white_balance_locked", False)
+                ),
+                "notes": list(getattr(lock, "notes", []) or []),
+            },
+        }
+        if args.scene:
+            notes["scene"] = str(args.scene)
 
         doc = build_calibration_document(
             result,
             projector_size=projector_size,
-            notes={
-                "camera_lock": {
-                    "exposure_locked": lock.exposure_locked,
-                    "white_balance_locked": lock.white_balance_locked,
-                    "notes": lock.notes,
-                }
-            },
+            notes=notes,
         )
         save_calibration(doc, args.output)
         print(f"wrote {args.output}", file=sys.stderr)
@@ -201,8 +267,7 @@ def main(argv: list[str] | None = None) -> int:
             )
             print(f"wrote {args.correspondence_out}", file=sys.stderr)
     finally:
-        display.close()
-        camera.release()
+        devices.close()
 
     return 0
 

@@ -21,3 +21,4 @@ moved path, but the decision itself stands until a successor replaces it.
 | [0008](0008-comfyui-asynchronous.md) | ComfyUI sits beside the renderer, never on its critical path | Accepted | 2026-11-18 |
 | [0009](0009-standalone-with-synesyn-bridge.md) | Lumur stays standalone; Synesyn integrates through a thin bridge | Accepted | 2026-11-18 |
 | [0010](0010-opencv-fullscreen-pattern-display.md) | OpenCV fullscreen for calibration pattern display | Accepted | 2026-11-18 |
+| [0011](0011-simulated-projector-camera-rig.md) | Simulated projector–camera rig for hardware-free development | Accepted | 2026-11-18 |

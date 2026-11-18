@@ -23,6 +23,9 @@ lumur-calibrate = "lumur.cli:main"
 [tool.setuptools.packages.find]
 include = ["lumur*"]
 
+[tool.setuptools.package-data]
+lumur = ["sim/presets/*.json"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
