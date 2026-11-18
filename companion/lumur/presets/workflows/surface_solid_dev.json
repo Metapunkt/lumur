@@ -1,0 +1,46 @@
+{
+  "schema": "lumur.workflow_preset",
+  "schema_version": "1.0",
+  "id": "surface_solid_dev",
+  "display_name": "Dev solid surface (mock / EmptyImage)",
+  "metadata": {
+    "preset": {
+      "tags": [
+        "lumur:surface_role=wall_1",
+        "lumur:surface_role=wall_2",
+        "lumur:surface_role=wall_3",
+        "lumur:surface_role=surface"
+      ]
+    }
+  },
+  "controls": {
+    "mask": false,
+    "depth": false,
+    "normal": false
+  },
+  "size_patches": [
+    {
+      "node_id": "1",
+      "width_input": "width",
+      "height_input": "height"
+    }
+  ],
+  "workflow": {
+    "1": {
+      "class_type": "EmptyImage",
+      "inputs": {
+        "width": 512,
+        "height": 512,
+        "batch_size": 1,
+        "color": 0
+      }
+    },
+    "2": {
+      "class_type": "SaveImage",
+      "inputs": {
+        "filename_prefix": "lumur_surface",
+        "images": ["1", 0]
+      }
+    }
+  }
+}

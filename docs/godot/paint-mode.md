@@ -120,6 +120,7 @@ addons/lumur/          Godot 4 addon (MIT)
   surface_target.gd    per-surface content handle
   paint_mode.gd(.shader)
   room_runtime.gd      small room-as-OS facade
+  surface_generator.gd null / package apply (PRD-002)
 demo/
   scenes/paint_demo.tscn
   scripts/headless_paint_render.gd
@@ -130,9 +131,10 @@ project.godot          demo project at repo root
 
 - **8-bit lookup UV** — fine at the 64×48 sim preset; high-res rooms may want
   a float/EXR export later (ADR 0013).
-- **Texture mode** is scaffolded in the surface API; the lean shader pass
-  uses solid + pulse for the first milestone. Full atlas sampling can land
-  without changing the export contract.
+- **Texture mode** samples a `Texture2DArray` (fixed 64² layers) via
+  lookup UV when a surface has `set_texture` / companion
+  `generated_textures`. Solid + pulse remain the lightweight defaults.
+  See [comfyui.md](../companion/comfyui.md).
 - **Godot in CI** — preferred when `godot` / `GODOT_BIN` is available. The
   Python reference painter is the guaranteed headless path and must stay
   behaviourally aligned with the shader.

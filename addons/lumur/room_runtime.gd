@@ -47,6 +47,19 @@ func pulse_surface(key: Variant, color: Color, hz: float = 1.0) -> void:
 		paint.set_surface_pulse(key, color, hz)
 
 
+func texture_surface(key: Variant, tex: Texture2D, tint: Color = Color.WHITE) -> void:
+	if paint != null:
+		paint.set_surface_texture(key, tex, tint)
+
+
+func apply_generated_textures() -> int:
+	## Apply companion-generated textures from paint_manifest.generated_textures.
+	## Safe to call when none exist (returns 0). Never talks to ComfyUI.
+	if paint == null:
+		return 0
+	return paint.apply_generated_from_package()
+
+
 func list_roles() -> PackedStringArray:
 	var out := PackedStringArray()
 	if package == null:

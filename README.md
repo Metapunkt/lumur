@@ -15,13 +15,16 @@ room.
 
 **Status:** [PRD-001](docs/product-requirements/PRD-001-CALIBRATE-PAINT-RIPPLE.md)
 is **complete-in-sim** (calibrate → scan → paint → footstep ripples against
-the simulated projector–camera rig). Hardware validation is still pending.
+the simulated projector–camera rig). [PRD-002](docs/product-requirements/PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md)
+**slice 1** (standalone ComfyUI surface generation, no Synesyn) is
+complete-in-sim against a ComfyUI mock. Hardware validation is still pending.
 Founding intent: [scratchpad](docs/scratchpad.md),
 [ADRs](docs/architectural-decisions/README.md),
 [PRDs](docs/product-requirements/README.md).
 
 Code: Python companion [`companion/`](companion/) (calibrate, sim, room scan,
-paint export, tracking) and Godot 4 addon [`addons/lumur/`](addons/lumur/).
+paint export, tracking, ComfyUI generation) and Godot 4 addon
+[`addons/lumur/`](addons/lumur/).
 
 ## Documentation
 
@@ -30,7 +33,8 @@ Start at [`docs/`](docs/README.md). Calibration:
 [`docs/companion/room-scan.md`](docs/companion/room-scan.md). Tracking:
 [`docs/companion/tracking.md`](docs/companion/tracking.md). Paint:
 [`docs/godot/paint-mode.md`](docs/godot/paint-mode.md). Ripples:
-[`docs/godot/ripples.md`](docs/godot/ripples.md).
+[`docs/godot/ripples.md`](docs/godot/ripples.md). ComfyUI generation:
+[`docs/companion/comfyui.md`](docs/companion/comfyui.md).
 
 ## Licence
 
