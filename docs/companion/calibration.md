@@ -95,7 +95,13 @@ lumur-calibrate \
   -o /tmp/sim-calibration.json
 ```
 
+## Next step
+
+Room scan (dense triangulation, confidence, floor/wall planes, versioned
+room package): [room-scan.md](room-scan.md).
+
 ## What this slice does not do
 
-Godot rendering, room meshing, paint-the-room, and footstep ripples are
-later PRD-001 work. This package is the calibration driver only.
+Godot rendering, paint-the-room, and footstep ripples are later PRD-001
+work. This package is the calibration driver; meshing / correspondence
+for those modes starts in the room-scan slice.

@@ -98,13 +98,22 @@ World coordinates: +Y up, devices look toward +Z into the room from negative Z.
 
 ```bash
 cd companion
-pytest tests/test_sim_e2e.py -q
+pytest tests/test_sim_e2e.py tests/test_room_scan.py -q
 ```
 
 The e2e suite runs capture → decode → plane calibration on the sim and
 checks decode accuracy, reprojection residuals, retained camera intrinsics,
 and essential-matrix pose against ground truth. A noise / ambient stress
 case uses the `noisy_room` preset with harsher sensor settings.
+
+Room-scan tests (`test_room_scan.py`) triangulate against ground-truth pose
+on `room_with_box`, recover the floor / walls, treat the box as non-planar
+or extra surfaces, and check degraded-but-sane confidence on `noisy_room`.
+See [room-scan.md](room-scan.md).
+
+**Pose note:** translation direction from plane-only calibration is weakly
+constrained on near-planar scenes. Prefer `room_with_box` (or
+`--use-sim-gt-pose` on `lumur-scan`) when judging metric depth.
 
 ## Licence
 

@@ -29,6 +29,9 @@ runbook): [companion/calibration.md](companion/calibration.md).
 Simulated projector–camera rig (hardware-free capture / calibration,
 scene format, limits): [companion/simulation.md](companion/simulation.md).
 
+Room scan (triangulation, confidence, planes, room package schema):
+[companion/room-scan.md](companion/room-scan.md).
+
 Further user guides, a developer guide, and implementation contracts will
 appear here as the runtime grows.
 
