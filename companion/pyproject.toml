@@ -20,6 +20,7 @@ dev = ["pytest>=7.4"]
 [project.scripts]
 lumur-calibrate = "lumur.cli:main"
 lumur-scan = "lumur.cli_scan:main"
+lumur-export-godot = "lumur.cli_export_godot:main"
 
 [tool.setuptools.packages.find]
 include = ["lumur*"]

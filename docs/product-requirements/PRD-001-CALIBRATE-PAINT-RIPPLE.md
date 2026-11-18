@@ -118,15 +118,27 @@ exists, not in a second copy of this journey.
   with per-pixel confidence/masks, RANSAC floor/wall planes, and a versioned
   `lumur.room` package ([room-scan.md](../companion/room-scan.md),
   [ADR 0012](../architectural-decisions/0012-versioned-room-package.md)).
-  Godot mesh consumption and paint-the-room remain later work.
+  A confidence-filtered triangle mesh remains optional later work; paint
+  consumes correspondence maps, not a mesh.
 - **REQ-001-005:** A paint-the-room mode must transfer appearance from
   camera space to projector space through the scanned correspondence,
   without requiring an authored 3D model.
+  **Status (2026-11-18):** Implemented — companion `lumur-export-godot` writes
+  projector-space PNG lookups; Godot `LumurPaintMode` and a Python reference
+  painter map per-surface content through that correspondence
+  ([paint-mode.md](../godot/paint-mode.md),
+  [ADR 0013](../architectural-decisions/0013-godot-paint-asset-export.md)).
 - **REQ-001-006:** The Godot renderer must project into surface
   coordinates and apply distortion via a lookup texture derived from the
   scan.
+  **Status (2026-11-18):** Implemented — `lookup.png` carries camera UV +
+  valid mask with distortion baked into the Gray-code correspondence;
+  surface roles (`floor`, `wall_n`) address content
+  ([paint-mode.md](../godot/paint-mode.md)).
 - **REQ-001-007:** The renderer must continue in the absence of Python
   inference and in the absence of ComfyUI.
+  **Status (2026-11-18):** Godot paint path loads only on-disk room/paint
+  assets; no companion socket or ComfyUI on the critical path.
 - **REQ-001-008:** Footstep ripples must be driven by ankle joints
   detected on the raw webcam frame and ray-cast onto the scanned floor.
 - **REQ-001-009:** Setup must include a way to lock camera exposure and
@@ -147,8 +159,12 @@ Automated coverage (companion, simulated rig):
   resolution), floor plane recovery, wall planes, box as non-planar or
   extra surfaces, noisy_room degraded-but-sane confidence
   (REQ-001-004) — `companion/tests/test_room_scan.py`.
+- Godot paint asset export, reference painter, and sim projector→camera
+  colour landing on the correct surfaces; optional Godot headless PNG
+  when a binary is available (REQ-001-005, REQ-001-006, REQ-001-007) —
+  `companion/tests/test_paint.py`.
 
-Manual coverage, when hardware or Godot slices begin:
+Manual coverage, when hardware begins:
 
 - Projected grid alignment at centre and edges, with residual report
   including worst region (REQ-001-001, REQ-001-002).
@@ -156,10 +172,8 @@ Manual coverage, when hardware or Godot slices begin:
   scale is omitted (REQ-001-003).
 - Visual inspection that the scan follows visible geometry and does not
   bridge gaps (REQ-001-004).
-- A paint-the-room pass completed without an authored mesh (REQ-001-005,
-  REQ-001-006).
-- Renderer still outputting after the companion inference path is
-  stopped and with ComfyUI disconnected (REQ-001-007).
+- Live projector paint on a real room without an authored mesh
+  (REQ-001-005, REQ-001-006).
 - Ripples under one and then two to four walkers, with latency and false
   triggers recorded; a deliberate occlusion case noted, not treated as
   a failure of the milestone (REQ-001-008, REQ-001-010).
@@ -175,10 +189,13 @@ Manual coverage, when hardware or Godot slices begin:
 - [ADR 0008: ComfyUI is asynchronous and optional](../architectural-decisions/0008-comfyui-asynchronous.md)
 - [ADR 0011: simulated projector–camera rig](../architectural-decisions/0011-simulated-projector-camera-rig.md)
 - [ADR 0012: versioned room package](../architectural-decisions/0012-versioned-room-package.md)
+- [ADR 0013: Godot paint asset export](../architectural-decisions/0013-godot-paint-asset-export.md)
 
 Companion runbooks: [calibration.md](../companion/calibration.md),
 [room-scan.md](../companion/room-scan.md),
 [simulation.md](../companion/simulation.md).
+
+Godot paint runbook: [paint-mode.md](../godot/paint-mode.md).
 
 ## Open questions and risks
 

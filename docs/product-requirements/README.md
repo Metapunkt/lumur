@@ -11,7 +11,7 @@ specs, instead of copying them.
 
 | ID | Product flow | Status | Last reviewed |
 |---|---|---|---|
-| [PRD-001](PRD-001-CALIBRATE-PAINT-RIPPLE.md) | Calibrate, paint the room, and footstep ripples | Draft (v0.2; scan slice in progress) | 2026-11-18 |
+| [PRD-001](PRD-001-CALIBRATE-PAINT-RIPPLE.md) | Calibrate, paint the room, and footstep ripples | Draft (v0.3; paint slice in progress) | 2026-11-18 |
 
 ## Lifecycle
 

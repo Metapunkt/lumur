@@ -29,9 +29,16 @@ def _sample_pattern(
     pv: np.ndarray,
     valid: np.ndarray,
 ) -> np.ndarray:
-    """Nearest-neighbour sample of a projector pattern at subpixel coords."""
+    """Nearest-neighbour sample of a projector pattern at subpixel coords.
+
+    ``pattern`` is HxW or HxWxC float/uint. Returns an array shaped like
+    ``pu`` (gray) or ``pu.shape + (C,)`` (colour).
+    """
     h, w = pattern.shape[:2]
-    out = np.zeros(pu.shape, dtype=np.float32)
+    if pattern.ndim == 2:
+        out = np.zeros(pu.shape, dtype=np.float32)
+    else:
+        out = np.zeros(pu.shape + (pattern.shape[2],), dtype=np.float32)
     if not np.any(valid):
         return out
     ui = np.rint(pu[valid]).astype(np.int32)
@@ -42,7 +49,11 @@ def _sample_pattern(
     keep = idx[inside]
     ui = ui[inside]
     vi = vi[inside]
-    flat = out.ravel()
+    if pattern.ndim == 2:
+        flat = out.ravel()
+        flat[keep] = pattern[vi, ui].astype(np.float32)
+        return flat.reshape(out.shape)
+    flat = out.reshape(-1, pattern.shape[2])
     flat[keep] = pattern[vi, ui].astype(np.float32)
     return flat.reshape(out.shape)
 
@@ -54,11 +65,13 @@ def render_camera_view(
     pattern: np.ndarray | None,
     *,
     rng: np.random.Generator | None = None,
+    retain_color: bool = False,
 ) -> RenderBuffers:
     """Render what ``camera`` sees when ``projector`` shows ``pattern``.
 
-    ``pattern`` is uint8 HxW (or HxWx3, converted to gray). ``None`` means
-    the projector is off (ambient only).
+    ``pattern`` is uint8 HxW or HxWx3. By default HxWx3 is converted to gray
+    (Gray-code / calibration path). Pass ``retain_color=True`` to keep an
+    RGB camera image for paint-the-room verification.
     """
     h, w = camera.height, camera.width
     dirs = pixel_rays(
@@ -96,21 +109,34 @@ def render_camera_view(
     proj_v = proj_v.reshape(h, w)
     valid_proj = valid_proj.reshape(h, w)
 
-    radiance = np.full((h, w), float(camera.ambient), dtype=np.float32)
+    use_color = (
+        retain_color
+        and pattern is not None
+        and pattern.ndim == 3
+        and pattern.shape[2] >= 3
+    )
+    if use_color:
+        radiance = np.full((h, w, 3), float(camera.ambient), dtype=np.float32)
+    else:
+        radiance = np.full((h, w), float(camera.ambient), dtype=np.float32)
+
     if pattern is not None:
-        if pattern.ndim == 3:
-            # BGR or RGB → luma-ish gray
-            pat = pattern.astype(np.float32)
-            if pat.shape[2] == 3:
+        pat = pattern.astype(np.float32)
+        if use_color:
+            linear = np.power(np.clip(pat[:, :, :3] / 255.0, 0.0, 1.0), projector.gamma)
+            linear = linear * 255.0
+            sampled = _sample_pattern(linear, proj_u, proj_v, valid_proj)
+            radiance = radiance + albedo_img[..., None] * sampled
+        else:
+            if pat.ndim == 3:
+                # BGR or RGB → luma-ish gray (OpenCV Gray-code path uses BGR writes)
                 gray = 0.114 * pat[:, :, 0] + 0.587 * pat[:, :, 1] + 0.299 * pat[:, :, 2]
             else:
-                gray = pat[:, :, 0]
-        else:
-            gray = pattern.astype(np.float32)
-        # Projector digital → approximate linear light via gamma.
-        linear = np.power(np.clip(gray / 255.0, 0.0, 1.0), projector.gamma) * 255.0
-        sampled = _sample_pattern(linear, proj_u, proj_v, valid_proj)
-        radiance = radiance + albedo_img * sampled
+                gray = pat
+            # Projector digital → approximate linear light via gamma.
+            linear = np.power(np.clip(gray / 255.0, 0.0, 1.0), projector.gamma) * 255.0
+            sampled = _sample_pattern(linear, proj_u, proj_v, valid_proj)
+            radiance = radiance + albedo_img * sampled
 
     exposed = radiance * float(camera.exposure)
     if camera.noise_std > 0:

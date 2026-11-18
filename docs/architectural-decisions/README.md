@@ -23,3 +23,4 @@ moved path, but the decision itself stands until a successor replaces it.
 | [0010](0010-opencv-fullscreen-pattern-display.md) | OpenCV fullscreen for calibration pattern display | Accepted | 2026-11-18 |
 | [0011](0011-simulated-projector-camera-rig.md) | Simulated projector–camera rig for hardware-free development | Accepted | 2026-11-18 |
 | [0012](0012-versioned-room-package.md) | Versioned room package for scan output | Accepted | 2026-11-18 |
+| [0013](0013-godot-paint-asset-export.md) | Godot paint assets exported as PNG + JSON | Accepted | 2026-11-18 |

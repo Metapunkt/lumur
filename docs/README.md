@@ -32,6 +32,9 @@ scene format, limits): [companion/simulation.md](companion/simulation.md).
 Room scan (triangulation, confidence, planes, room package schema):
 [companion/room-scan.md](companion/room-scan.md).
 
+Godot paint-the-room mode (addon, surface targets, headless render):
+[godot/paint-mode.md](godot/paint-mode.md).
+
 Further user guides, a developer guide, and implementation contracts will
 appear here as the runtime grows.
 
