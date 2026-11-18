@@ -7,7 +7,7 @@ import time
 import uuid
 from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass, field
-from typing import Any, Callable
+from typing import Any
 
 from lumur.generate.provider import SurfaceGenerator
 from lumur.generate.types import JobStatus, SurfaceRenderRequest, SurfaceRenderResult

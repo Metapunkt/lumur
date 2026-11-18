@@ -242,6 +242,79 @@ def calibrate_with_checkerboard(
     )
 
 
+def _refine_projector_pinhole(
+    cam_pts: np.ndarray,
+    proj_pts: np.ndarray,
+    K_c: np.ndarray,
+    dist_c: np.ndarray,
+    projector_size: tuple[int, int],
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Search a projector focal length that maximises essential-matrix support.
+
+    Returns ``(K_p, R_e, T_e, pose_mask)`` where ``R_e``/``T_e`` come from
+    ``recoverPose`` (unit translation). Used to pick a Euclidean homography
+    solution that agrees with the stereo motion.
+    """
+    import cv2
+
+    proj_w, proj_h = projector_size
+    prior_f = float(max(proj_w, proj_h))
+    cam_n = cv2.undistortPoints(
+        cam_pts.reshape(-1, 1, 2), K_c, dist_c
+    ).reshape(-1, 2)
+    best: tuple | None = None
+    for f in np.linspace(0.7 * prior_f, 1.4 * prior_f, 36):
+        K_p = np.array(
+            [[f, 0.0, proj_w / 2.0], [0.0, f, proj_h / 2.0], [0.0, 0.0, 1.0]],
+            dtype=np.float64,
+        )
+        proj_n = cv2.undistortPoints(
+            proj_pts.reshape(-1, 1, 2), K_p, None
+        ).reshape(-1, 2)
+        E, mask = cv2.findEssentialMat(
+            cam_n,
+            proj_n,
+            focal=1.0,
+            pp=(0.0, 0.0),
+            method=cv2.RANSAC,
+            threshold=0.01,
+            prob=0.999,
+        )
+        if E is None or mask is None:
+            continue
+        _, R, T, mask_pose = cv2.recoverPose(
+            E, cam_n, proj_n, cameraMatrix=np.eye(3), mask=mask.copy()
+        )
+        pose_inl = int((mask_pose.ravel() > 0).sum()) if mask_pose is not None else 0
+        score = (pose_inl, int(mask.sum()), -abs(float(f) - prior_f))
+        if best is None or score > best[0]:
+            best = (
+                score,
+                K_p,
+                np.asarray(R, dtype=np.float64),
+                np.asarray(T, dtype=np.float64).reshape(3),
+                mask_pose,
+            )
+    if best is None:
+        K_p, _ = estimate_pinhole(projector_size)
+        return K_p, np.eye(3), np.array([0.0, 0.0, 1.0]), np.ones(len(cam_pts), dtype=np.uint8)
+    return best[1], best[2], best[3], best[4]
+
+
+def _undistorted_ray(
+    uv: tuple[float, float], K_c: np.ndarray, dist_c: np.ndarray
+) -> np.ndarray:
+    import cv2
+
+    und = cv2.undistortPoints(
+        np.array([[[float(uv[0]), float(uv[1])]]], dtype=np.float64),
+        K_c,
+        dist_c,
+    ).reshape(2)
+    ray = np.array([und[0], und[1], 1.0], dtype=np.float64)
+    return ray / np.linalg.norm(ray)
+
+
 def calibrate_plane_with_measured_distance(
     corr: CorrespondenceMap,
     *,
@@ -252,14 +325,22 @@ def calibrate_plane_with_measured_distance(
     point_a_cam: tuple[float, float],
     point_b_cam: tuple[float, float],
     distance_m: float,
+    projector_matrix: np.ndarray | None = None,
 ) -> CalibrationResult:
     """Plane-based calibration: projective pose, metric scale from one distance.
 
     Assumes the decoded scene is dominated by one plane. Camera intrinsics may
     be supplied; otherwise a pinhole prior is used. Projector intrinsics are
-    estimated from the plane homography. Translation is scaled so the 3D
-    distance between the rays through ``point_a_cam`` and ``point_b_cam``
-    (intersected with the recovered plane) matches ``distance_m``.
+    refined from correspondence support (focal search) unless
+    ``projector_matrix`` is given. Translation is scaled so the 3D distance
+    between the rays through ``point_a_cam`` and ``point_b_cam`` (intersected
+    with the recovered plane ``N·X = 1``) matches ``distance_m``.
+
+    Uses a Euclidean homography ``inv(K_p) H K_c`` (OpenCV convention
+    ``H_e ≈ R + T Nᵀ``) and selects the chirality-consistent solution whose
+    rotation best matches an essential-matrix pose. The previous
+    ``decomposeHomographyMat(inv(H), K_c)`` + max-``N_z`` path systematically
+    picked a wrong scale (~2.5×) on the sim presets.
     """
     import cv2
 
@@ -281,52 +362,86 @@ def calibrate_plane_with_measured_distance(
     if H is None:
         raise ValueError("homography estimation failed")
 
-    K_p, dist_p = estimate_pinhole(projector_size)
-    # DecomposeHomographyMat expects a plane→image homography; invert cam→proj.
-    H_inv = np.linalg.inv(H)
-    n_solutions, Rs, Ts, Ns = cv2.decomposeHomographyMat(H_inv, K_c)
+    if projector_matrix is not None:
+        K_p = np.asarray(projector_matrix, dtype=np.float64)
+        # Still recover an E pose to score homography solutions.
+        cam_n = cv2.undistortPoints(
+            cam_pts.reshape(-1, 1, 2), K_c, dist_c
+        ).reshape(-1, 2)
+        proj_n = cv2.undistortPoints(
+            proj_pts.reshape(-1, 1, 2), K_p, None
+        ).reshape(-1, 2)
+        E, mask = cv2.findEssentialMat(
+            cam_n, proj_n, focal=1.0, pp=(0.0, 0.0), method=cv2.RANSAC, threshold=0.01
+        )
+        if E is not None:
+            _, R_e, T_e, _ = cv2.recoverPose(
+                E, cam_n, proj_n, cameraMatrix=np.eye(3), mask=mask
+            )
+            R_e = np.asarray(R_e, dtype=np.float64)
+            T_e = np.asarray(T_e, dtype=np.float64).reshape(3)
+        else:
+            R_e, T_e = np.eye(3), np.array([0.0, 0.0, 1.0])
+    else:
+        K_p, R_e, T_e, _ = _refine_projector_pinhole(
+            cam_pts, proj_pts, K_c, dist_c, projector_size
+        )
+    dist_p = _default_distortion()
 
-    # Prefer the solution whose plane normal faces the camera.
+    # Euclidean homography in normalised coordinates (OpenCV: H_e = R + T Nᵀ,
+    # plane N·X = 1 in the unscaled reconstruction).
+    H_e = np.linalg.inv(K_p) @ H @ K_c
+    n_solutions, Rs, Ts, Ns = cv2.decomposeHomographyMat(H_e, np.eye(3))
+
     best = None
-    best_score = -np.inf
+    best_key: tuple | None = None
     for i in range(n_solutions):
-        R_i = Rs[i]
-        T_i = Ts[i].reshape(3)
-        N_i = Ns[i].reshape(3)
-        if T_i[2] == 0:
+        R_i = np.asarray(Rs[i], dtype=np.float64)
+        T_i = np.asarray(Ts[i], dtype=np.float64).reshape(3)
+        N_i = np.asarray(Ns[i], dtype=np.float64).reshape(3)
+        try:
+            ray_a = _undistorted_ray(point_a_cam, K_c, dist_c)
+            ray_b = _undistorted_ray(point_b_cam, K_c, dist_c)
+            denom_a = float(N_i @ ray_a)
+            denom_b = float(N_i @ ray_b)
+            if abs(denom_a) < 1e-9 or abs(denom_b) < 1e-9:
+                continue
+            Xa = ray_a / denom_a
+            Xb = ray_b / denom_b
+        except Exception:
             continue
-        score = float(N_i[2])
-        if score > best_score:
-            best_score = score
-            best = (R_i, T_i, N_i)
+        # Chirality: measured points must lie in front of the camera.
+        if Xa[2] <= 0.0 or Xb[2] <= 0.0:
+            continue
+        current = float(np.linalg.norm(Xa - Xb))
+        if current < 1e-12:
+            continue
+        # Rotation agreement with essential-matrix pose.
+        cos_r = float(np.clip((np.trace(R_i @ R_e.T) - 1.0) * 0.5, -1.0, 1.0))
+        ang = float(np.degrees(np.arccos(cos_r)))
+        T_scaled = T_i * (float(distance_m) / current)
+        t_dir = T_scaled / max(np.linalg.norm(T_scaled), 1e-12)
+        e_dir = T_e / max(np.linalg.norm(T_e), 1e-12)
+        align = abs(float(t_dir @ e_dir))
+        key = (-ang, align)
+        if best_key is None or key > best_key:
+            best_key = key
+            best = (R_i, T_scaled, N_i)
 
     if best is None:
-        # Fall back to identity rotation and unit translation along z.
-        R = np.eye(3)
-        T = np.array([0.0, 0.0, 1.0])
-        N = np.array([0.0, 0.0, 1.0])
-    else:
-        R, T, N = best
-
-    # Intersect rays through A and B with the plane N·X = 1 (pre-scale).
-    def ray_plane(uv: tuple[float, float]) -> np.ndarray:
-        x = np.array([uv[0], uv[1], 1.0], dtype=np.float64)
-        d = np.linalg.inv(K_c) @ x
-        d = d / np.linalg.norm(d)
-        # Plane: N·X = 1
-        denom = float(N @ d)
-        if abs(denom) < 1e-9:
-            raise ValueError("ray parallel to plane for measured-distance point")
-        return d / denom
-
-    Xa = ray_plane(point_a_cam)
-    Xb = ray_plane(point_b_cam)
-    current = float(np.linalg.norm(Xa - Xb))
-    if current < 1e-12:
-        raise ValueError("measured-distance points coincide in reconstructed plane")
-    scale = float(distance_m) / current
-    T = T * scale
-    # Plane distance scales the same way; residuals stay in pixels.
+        raise ValueError(
+            "no chirality-consistent homography solution for measured-distance points"
+        )
+    _R_h, T_h, _N = best
+    # Hybrid pose: essential-matrix rotation + translation *direction* (stronger
+    # on near-planar rooms) with metric *magnitude* from the homography plane
+    # scale. Pure H rotation left wall normals tilted on room_with_box.
+    scale_m = float(np.linalg.norm(T_h))
+    e_dir = T_e / max(np.linalg.norm(T_e), 1e-12)
+    T = e_dir * scale_m
+    if float(T @ T_h) < 0.0:
+        T = -T
+    R = R_e
 
     # Build residual image from homography reprojection on inliers.
     residual_image = np.zeros((cam_h, cam_w), dtype=np.float32)

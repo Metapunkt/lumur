@@ -24,7 +24,6 @@ from lumur_synesyn.story_stage_layers import (
     LAYER_CHARACTER,
     LAYER_CLIP,
     LayerFrame,
-    STUB_LAYER_COLORS,
     StubStoryStageSource,
 )
 from lumur_synesyn.story_stage_layout import (

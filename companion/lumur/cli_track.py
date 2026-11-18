@@ -3,13 +3,11 @@
 from __future__ import annotations
 
 import argparse
-import time
 
 import numpy as np
 
 from lumur.events.udp_json import EventSender
 from lumur.sim import SimRig, default_crossing_people
-from lumur.sim.geometry import Plane
 from lumur.track.footsteps import FootstepDetector
 from lumur.track.pipeline import TrackingPipeline
 from lumur.track.pose import OraclePoseDetector

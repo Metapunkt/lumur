@@ -8,7 +8,6 @@ from pathlib import Path
 
 import cv2
 import numpy as np
-import pytest
 
 from lumur.generate.comfy_provider import ComfyUISurfaceGenerator
 from lumur.generate.controls import build_control_images, write_control_images

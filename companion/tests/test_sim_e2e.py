@@ -147,9 +147,13 @@ def test_sim_e2e_decode_and_calibrate_against_ground_truth():
     baseline = float(np.linalg.norm(rig.scene.camera.center - rig.scene.projector.center))
     assert float(np.linalg.norm(gt.stereo_T)) == pytest.approx(baseline, rel=1e-6)
 
-    # Scaled translation from plane calibration is finite and non-trivial.
+    # Scaled translation must match the true stereo baseline (~10%).
     assert np.isfinite(result.stereo.T).all()
-    assert np.linalg.norm(result.stereo.T) > 0.05
+    est_baseline = float(np.linalg.norm(result.stereo.T))
+    assert est_baseline == pytest.approx(baseline, rel=0.10)
+    t_cal = result.stereo.T / est_baseline
+    assert max(float(t_cal @ t_gt), float((-t_cal) @ t_gt)) > 0.85
+    assert _rotation_angle_deg(result.stereo.R, gt.stereo_R) < 8.0
 
     doc = build_calibration_document(result, projector_size=rig.projector_size)
     validate_calibration_document(doc)

@@ -13,8 +13,7 @@ from lumur.track.subtraction import PredictedFrameSubtractor, SubtractionResult
 from lumur.track.tracker import PersonTrack, SimpleByteTracker
 
 if TYPE_CHECKING:
-    from lumur.audience.detector import AudienceDetector
-    from lumur.audience.events import AudienceEvent
+    pass
 
 
 @dataclass
