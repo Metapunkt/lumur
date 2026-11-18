@@ -1,3 +1,11 @@
+from lumur.schema.app import (
+    SCHEMA_ID as APP_SCHEMA_ID,
+    SCHEMA_VERSION as APP_SCHEMA_VERSION,
+    build_app_manifest,
+    load_app_manifest,
+    save_app_manifest,
+    validate_app_manifest,
+)
 from lumur.schema.calibration import (
     SCHEMA_VERSION as CALIBRATION_SCHEMA_VERSION,
     build_calibration_document,
@@ -20,6 +28,8 @@ __all__ = [
     "SCHEMA_VERSION",
     "CALIBRATION_SCHEMA_VERSION",
     "ROOM_SCHEMA_VERSION",
+    "APP_SCHEMA_ID",
+    "APP_SCHEMA_VERSION",
     "build_calibration_document",
     "load_calibration",
     "save_calibration",
@@ -28,4 +38,8 @@ __all__ = [
     "load_room_package",
     "save_room_package",
     "validate_room_document",
+    "build_app_manifest",
+    "load_app_manifest",
+    "save_app_manifest",
+    "validate_app_manifest",
 ]

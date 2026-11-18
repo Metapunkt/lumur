@@ -18,7 +18,8 @@ and [PRD-002](docs/product-requirements/PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md)
 are **complete-in-sim** (calibrate → paint → ripples; generation, Synesyn
 bridge, Story Stage, opt-in audience steering / replay — all against the
 sim and mocks). [PRD-003](docs/product-requirements/PRD-003-LUMUR-OS-APPLICATION-LAYER.md)
-is a **draft** for the application layer (manifests, compositor, lifecycle).
+is in progress: **slice 1 (manifest + room fit) complete-in-sim**; later
+slices cover input permissions, compositor/lifecycle, and bundled apps.
 Hardware validation is still pending. Founding intent:
 [scratchpad](docs/scratchpad.md),
 [ADRs](docs/architectural-decisions/README.md),
@@ -44,7 +45,8 @@ on surfaces: [`docs/bridge/story-stage.md`](docs/bridge/story-stage.md).
 Audience steering:
 [`docs/bridge/audience-steering.md`](docs/bridge/audience-steering.md).
 Session / Story Log replay:
-[`docs/bridge/replay.md`](docs/bridge/replay.md).
+[`docs/bridge/replay.md`](docs/bridge/replay.md). App manifests + room fit:
+[`docs/apps/manifest.md`](docs/apps/manifest.md).
 
 ## Licence
 

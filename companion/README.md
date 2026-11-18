@@ -95,6 +95,16 @@ pytest tests/test_story_stage_surfaces.py
 
 See [docs/bridge/story-stage.md](../docs/bridge/story-stage.md).
 
+## App manifests + room fit (PRD-003 slice 1)
+
+```bash
+pytest tests/test_app_manifest_fit.py
+```
+
+`lumur.app` schema / validator, `RoomServices` facade, and
+`fit_app_to_room` bind surface *kinds* to a scanned room (no Synesyn).
+See [docs/apps/manifest.md](../docs/apps/manifest.md).
+
 ## Audience steering + session replay (slice 4)
 
 Opt-in per scenario (`lumur_audience`). Core emits presence / zone /
