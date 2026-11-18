@@ -55,3 +55,18 @@ func list_roles() -> PackedStringArray:
 	for k in index.keys():
 		out.append(str(k))
 	return out
+
+
+func bind_event_receiver(receiver: LumurEventReceiver) -> void:
+	## Convenience: apps can subscribe without knowing UDP details.
+	if receiver == null:
+		return
+	if not receiver.footstep.is_connected(_on_runtime_footstep):
+		receiver.footstep.connect(_on_runtime_footstep)
+
+
+signal footstep(event: Dictionary)
+
+
+func _on_runtime_footstep(event: Dictionary) -> void:
+	footstep.emit(event)

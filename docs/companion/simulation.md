@@ -29,7 +29,7 @@ List built-in presets from Python:
 
 ```python
 from lumur.sim import list_presets
-print(list_presets())  # empty_room, room_with_box, noisy_room
+print(list_presets())  # empty_room, room_with_box, noisy_room, room_with_walkers
 ```
 
 ## Using the sim as a device backend
@@ -69,7 +69,8 @@ Built-in presets live under `companion/lumur/sim/presets/`.
 | `room.width` / `depth` / `height` | Metres; floor at `y = 0`, origin at floor centre. |
 | `room.floor_albedo` / `wall_albedo` | Diffuse reflectance in `[0, 1]`. |
 | `room.boxes[]` | Axis-aligned boxes: `center`, `size`, optional `albedo`, `name`. |
-| `room.occupants[]` | Static person placeholders (AABB stand-ins): `center`, `height`, `radius`. Pose is not simulated. |
+| `room.occupants[]` | Static person placeholders (AABB stand-ins): `center`, `height`, `radius`. |
+| `room.people[]` | Animated articulated walkers: `waypoints`, `speed_m_s`, `height`, `phase_offset`, … See [tracking.md](tracking.md). |
 | `room.planes[]` | Alternate explicit planes (`point`, `normal`, `albedo`) when `type` is not `axis`. |
 | `projector` | `width`, `height`, `eye`, `target`, optional `fov_y_deg`, `gamma`, `up`, `K`. |
 | `camera` | Same pose fields, plus `distortion` (Brown–Conrady), `exposure`, `noise_std`, `ambient`, `blur_sigma`, `seed`. |
@@ -85,14 +86,22 @@ World coordinates: +Y up, devices look toward +Z into the room from negative Z.
 - Exact ground truth: device intrinsics / extrinsics, per-pixel depth,
   camera→projector correspondences, and stereo `R`/`T` (camera → projector).
 
+## Animated people and latency
+
+`room.people` (or `SimRig(..., n_people=N)`) adds capsule stick figures with
+ground-truth joints each frame. `latency_frames` makes the camera observe
+projector frame N−k. Exposure / white balance stay locked. Predicted-frame
+subtraction, pose, and footsteps live in `lumur.track` —
+[tracking.md](tracking.md).
+
 ## What it does not model
 
 - Specular materials, colour cross-talk, projector focus falloff, or
   rolling shutter.
 - Temporal AE/AWB behaviour of real USB cameras.
-- Animated humans or pose estimation (placeholders are static occluders only).
-- Multi-projector blending, Godot rendering, or predicted-frame subtraction
-  (those reuse this geometry later; see PRD-001).
+- Skinned human meshes or neural pose inside the renderer (oracle pose is
+  separate).
+- Multi-projector blending.
 
 ## Tests
 
