@@ -10,8 +10,8 @@
 Accepted after owner merge of
 [PR #8](https://github.com/Metapunkt/lumur/pull/8). Slice 1 lands the
 generator interface, null provider, and standalone ComfyUI provider in the
-Python companion (Godot consumes results via paint mode); Hub provider stays
-in `lumur_synesyn` (slice 2).
+Python companion (Godot consumes results via paint mode). Slice 2 adds the
+optional Hub provider in `lumur_synesyn` behind the same interface.
 
 ## Context
 

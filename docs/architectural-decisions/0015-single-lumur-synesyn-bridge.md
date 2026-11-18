@@ -7,8 +7,10 @@
 
 Accepted after owner merge of
 [PR #8](https://github.com/Metapunkt/lumur/pull/8) (docs: PRD-002 + ADRs
-0015–0016). Slice 1 implements standalone generation without this bridge;
-`lumur_synesyn` remains future work (PRD-002 slices 2+).
+0015–0016). Slice 1 implements standalone generation without this bridge.
+Slice 2 lands `addons/lumur_synesyn/` + optional Python
+`companion/lumur_synesyn/` (Hub provider, mock-tested). Story Stage host
+and audience steering remain slices 3–4.
 
 ## Context
 

@@ -145,12 +145,16 @@ class SurfaceRenderRequest:
         routing = self.routing or {}
         mode = str(routing.get("mode") or "direct").lower()
         provider = str(routing.get("provider") or "comfyui").lower()
-        if mode != "direct":
-            raise ValueError("slice 1 supports routing.mode=direct only")
+        # Align with SynesynRenderRequestV1: direct | hub; provider stays comfyui.
+        # Hub submit lives in optional ``lumur_synesyn`` — core only validates shape.
+        if mode not in ("direct", "hub"):
+            raise ValueError(f"unsupported routing.mode {mode!r} (direct|hub)")
         if provider != "comfyui":
-            raise ValueError("slice 1 supports routing.provider=comfyui only")
-        if not str(routing.get("comfy_base_url") or "").strip():
+            raise ValueError("routing.provider must be comfyui")
+        if mode == "direct" and not str(routing.get("comfy_base_url") or "").strip():
             raise ValueError("comfy_base_url required for direct ComfyUI")
+        if mode == "hub" and not str(routing.get("hub_base_url") or "").strip():
+            raise ValueError("hub_base_url required for hub routing")
         wf = self.workflow or {}
         has_inline = isinstance(wf.get("inline"), dict) and bool(wf.get("inline"))
         has_art = bool(str(wf.get("artifact_id") or "").strip())

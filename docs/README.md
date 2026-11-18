@@ -46,8 +46,10 @@ Footstep ripples in Godot:
 Standalone ComfyUI surface generation (no Synesyn):
 [companion/comfyui.md](companion/comfyui.md).
 
-Next product intent (optional Synesyn bridge, Story Stage on surfaces —
-PRD-002 slices 2+):
+Optional Synesyn Hub bridge (`lumur_synesyn`, PRD-002 slice 2):
+[bridge/synesyn.md](bridge/synesyn.md).
+
+Next product intent (Story Stage on surfaces — PRD-002 slices 3+):
 [PRD-002](product-requirements/PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md),
 [ADR 0015](architectural-decisions/0015-single-lumur-synesyn-bridge.md),
 [ADR 0016](architectural-decisions/0016-pluggable-surface-generators.md).

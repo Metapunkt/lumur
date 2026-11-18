@@ -18,6 +18,9 @@ dependencies = [
 dev = ["pytest>=7.4"]
 pose = ["mediapipe>=0.10"]
 yolo = ["ultralytics>=8.0"]
+# Optional Synesyn Hub bridge (PRD-002 slice 2). No extra runtime deps —
+# stdlib HTTP only. Declared so installs can opt in explicitly.
+synesyn = []
 
 [project.scripts]
 lumur-calibrate = "lumur.cli:main"
@@ -25,9 +28,10 @@ lumur-scan = "lumur.cli_scan:main"
 lumur-export-godot = "lumur.cli_export_godot:main"
 lumur-track = "lumur.cli_track:main"
 lumur-generate = "lumur.cli_generate:main"
+lumur-generate-synesyn = "lumur_synesyn.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["lumur*"]
+include = ["lumur*", "lumur_synesyn*"]
 
 [tool.setuptools.package-data]
 lumur = ["sim/presets/*.json", "presets/workflows/*.json"]
