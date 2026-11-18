@@ -43,6 +43,16 @@ A first joint demo, when both sides are ready, was suggested: one
 character projected onto a real wall, speaking a saved Story Log. That
 suggestion is not a commitment in this ADR.
 
+## Amendment — 2026-11-18
+
+The bridge is named and scoped in
+[ADR 0015](0015-single-lumur-synesyn-bridge.md) (`lumur_synesyn`) and
+[PRD-002](../product-requirements/PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md).
+Surface generation without Synesyn is first-class
+([ADR 0016](0016-pluggable-surface-generators.md)); the Hub is only an
+optional provider inside the bridge. This ADR’s standalone rule is
+unchanged.
+
 ## Consequences
 
 - Positive: Lumur's first users need only a webcam, a projector and the
