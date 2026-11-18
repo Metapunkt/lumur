@@ -1,2 +1,37 @@
-# lumur
-Projection-mapping runtime for Godot that makes rooms come alive with just a webcam and a projector. A spiritual successor to Microsoft's RoomAlive Toolkit. Provides structured-light room scanning, surface-aware apps, interaction through people's movement, and optional ComfyUI driven AI content integration. No Kinect required.
+# Lumur
+
+Local-first projection-mapping runtime for Godot that makes rooms come alive
+with just a webcam and a projector. A spiritual successor to Microsoft's
+RoomAlive: structured-light room scanning, surface-aware apps, interaction
+through people's movement, and optional ComfyUI generation. No Kinect
+required.
+
+The name joins *lumen* (light) with *mur* (French, from Latin *murus*: wall).
+
+Geometry is authoritative: the system measures the room occasionally, tracks
+only the interactions that matter, and renders continuously. Experiences are
+apps that target named surfaces, so the same app can be installed in another
+room.
+
+**Status:** pre-code, design phase. The
+[scratchpad](docs/scratchpad.md),
+[architectural decisions](docs/architectural-decisions/README.md) and
+[product requirements](docs/product-requirements/README.md) record the founding
+intent. A public repository is planned at
+[Metapunkt/lumur](https://github.com/Metapunkt/lumur).
+
+## Documentation
+
+Start at [`docs/`](docs/README.md).
+
+## Licence
+
+© 2026 “Lumur” by Ayodele Arigbabu
+
+Source code is MIT. Text, documentation, and other website material are
+[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). See
+[`LICENSE`](LICENSE).
+
+## Credits
+
+Designed by **Ayodele Arigbabu**, Metapunkt.
