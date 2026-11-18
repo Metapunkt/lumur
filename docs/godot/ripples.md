@@ -14,9 +14,11 @@ floor surface through paint-mode targeting
 | `addons/lumur/event_receiver.gd` | UDP JSON listener (`LumurEventReceiver`) |
 | `addons/lumur/ripple_layer.gd` | Stamps rings into a floor overlay texture |
 | `addons/lumur/paint_mode.gdshader` | Composites `ripple_tex` on the floor surface id |
-| `demo/scenes/ripple_demo.tscn` | Paint + receiver + ripples |
+| `demo/scenes/ripple_demo.tscn` | Interactive demo (paint + receiver + ripples) |
+| `apps/ripples/` | Bundled `lumur.app` (PRD-003): floor `shares` overlay + `footstep` input |
 
-Apps never call OpenCV or pose models. They subscribe to footstep signals.
+Apps never call OpenCV or pose models. They subscribe to footstep signals
+through the filtered input bus when running as a packaged app.
 
 ## Run with the companion
 

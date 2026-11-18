@@ -142,6 +142,14 @@ class Compositor:
             if entry.base_app_id is not None
         }
 
+    def app_controls_surface(self, app_id: str, surface_id: int) -> bool:
+        """True when ``app_id`` owns base or overlays ``surface_id``."""
+        claims = self.claims_by_app.get(app_id) or {}
+        return int(surface_id) in claims
+
+    def controlled_surface_ids(self, app_id: str) -> set[int]:
+        return set((self.claims_by_app.get(app_id) or {}).keys())
+
     def ownership_table(self) -> dict[int, dict[str, Any]]:
         return {sid: e.to_dict() for sid, e in sorted(self.ownership.items())}
 
@@ -169,7 +177,14 @@ class Compositor:
             if binding.surface_id is None:
                 continue  # optional unmet — no geometry invention
             sid = int(binding.surface_id)
-            want_overlay = as_overlay or key in share_set
+            entry = self.ownership.get(sid)
+            other_base = (
+                entry is not None
+                and entry.base_app_id is not None
+                and entry.base_app_id != app_id
+            )
+            # ``shares`` means willing to overlay; alone, still take base.
+            want_overlay = as_overlay or (key in share_set and other_base)
             if want_overlay:
                 claim = self._claim_overlay(app_id, sid, key)
             else:

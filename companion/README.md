@@ -127,7 +127,21 @@ shared `DwellGate`. Paused apps receive no input events. See
 [docs/apps/compositor.md](../docs/apps/compositor.md) and
 [docs/apps/lifecycle.md](../docs/apps/lifecycle.md).
 
-## Audience steering + session replay (slice 4)
+## Bundled apps + generation (PRD-003 slice 4)
+
+```bash
+pytest tests/test_app_bundled_generation.py
+```
+
+`apps/paint` and `apps/ripples` install via the launcher on sim presets;
+ripples overlays a painted floor through `shares`. Story Stage lives under
+`addons/lumur_synesyn/apps/story_stage` and appears in `list_startable` only
+with `require_bridge=True`. `AppGenerationService` gates
+`SurfaceGenerator` requests to owned/overlaid surfaces (null, MockComfyUI,
+MockHub). See [docs/apps/generation.md](../docs/apps/generation.md) and
+[apps/README.md](../apps/README.md).
+
+## Audience steering + session replay (PRD-002 slice 4)
 
 Opt-in per scenario (`lumur_audience`). Core emits presence / zone /
 gathering; the bridge steers Story Stage only when opted in.

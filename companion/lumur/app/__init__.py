@@ -15,6 +15,13 @@ from lumur.app.fit import (
     UnmetSurface,
     fit_app_to_room,
 )
+from lumur.app.generation import (
+    AppGenerationRecord,
+    AppGenerationService,
+    GenerationDenied,
+    bridge_app_roots,
+    bundled_app_roots,
+)
 from lumur.app.input_bus import (
     AppInputBus,
     AppInputSession,
@@ -40,6 +47,8 @@ __all__ = [
     "APP_SCHEMA_VERSION",
     "KNOWN_INPUTS",
     "MANIFEST_FILENAME",
+    "AppGenerationRecord",
+    "AppGenerationService",
     "AppInputBus",
     "AppInputSession",
     "AppLifecycle",
@@ -50,6 +59,7 @@ __all__ = [
     "CompositorError",
     "FitError",
     "FitResult",
+    "GenerationDenied",
     "Launcher",
     "LifecycleError",
     "OwnershipEntry",
@@ -62,7 +72,9 @@ __all__ = [
     "UnmetSurface",
     "ZoneAppSwitcher",
     "ZoneSwitchConfig",
+    "bridge_app_roots",
     "build_app_manifest",
+    "bundled_app_roots",
     "fit_app_to_room",
     "load_app_manifest",
     "save_app_manifest",

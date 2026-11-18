@@ -5,10 +5,10 @@ extends Node
 ## surfaces by id or role. Owns the projector paint output when a
 ## ``LumurPaintMode`` child (or assigned node) is present.
 ##
-## PRD-003 slices 1–3: app-manifest load + room-fit, filtered input bus,
-## compositor ownership, and install/launch/pause/switch lifecycle. Apps
-## should ask for surfaces through this facade rather than hard-coding
-## projector pixels.
+## PRD-003: app-manifest load + room-fit, filtered input bus, compositor
+## ownership, install/launch/pause/switch lifecycle, and app-side generation
+## gates. Apps should ask for surfaces through this facade rather than
+## hard-coding projector pixels.
 
 @export var godot_assets_path: String = ""
 @export var paint_path: NodePath

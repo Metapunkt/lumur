@@ -32,7 +32,7 @@ an implementation detail.
 | `inputs` | yes | Allowlist of room event types (ADR 0019 vocabulary) |
 | `generation` | no | If true, app may call `SurfaceGenerator` (async / optional) |
 | `bridge` | no | `null` for core apps; `"lumur_synesyn"` for bridge-only apps |
-| `shares` | no | Surface keys willing to draw as overlays (compositor, later slice) |
+| `shares` | no | Surface keys willing to draw as overlays ([compositor.md](compositor.md)) |
 
 Readers **ignore unknown fields**. Breaking changes bump `schema_version`.
 
@@ -74,7 +74,9 @@ other projector-placement fields. Placement is the runtime’s job.
 }
 ```
 
-Shipped examples: [`apps/examples/`](../../apps/examples/).
+Bundled apps: [`apps/paint`](../../apps/paint/), [`apps/ripples`](../../apps/ripples/).
+Schema fixtures: [`apps/examples/`](../../apps/examples/). Story Stage
+(bridge only): [`addons/lumur_synesyn/apps/story_stage/`](../../addons/lumur_synesyn/apps/story_stage/).
 
 ## Room fit
 
@@ -136,6 +138,7 @@ and deterministic binding on `empty_room`, `room_with_box`, and `noisy_room`.
 Per-app input allowlist and event bus: [input.md](input.md) (PRD-003 slice 2).
 Compositor ownership / masking: [compositor.md](compositor.md) (slice 3).
 Lifecycle / launcher / zone switch: [lifecycle.md](lifecycle.md) (slice 3).
+Generation from apps: [generation.md](generation.md) (slice 4).
 
 ## Licence
 

@@ -9,6 +9,8 @@ Correspondence-based projector painting for [PRD-001](../product-requirements/PR
 No authored 3D mesh is required. The scan’s projector→camera map selects a
 surface id per projector pixel; the Godot addon fills those pixels from
 per-surface content (solid colour, tinted texture hook, or a simple pulse).
+Bundled installable app: [`apps/paint/`](../../apps/paint/) (PRD-003
+`lumur.app`, optional generation).
 
 ## Prerequisites
 

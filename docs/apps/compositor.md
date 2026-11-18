@@ -15,7 +15,7 @@ Manifest fit: [manifest.md](manifest.md). Lifecycle / launcher:
 | Rule | Behaviour |
 | --- | --- |
 | Exclusive by default | One running app owns a bound surface’s **base** layer |
-| Declared overlays | Manifest `shares: ["floor"]` may draw an overlay without stealing base |
+| Declared overlays | Manifest `shares: ["floor"]` may draw an overlay without stealing base (alone, the app still takes base) |
 | Conflict at launch | Second exclusive claim on the same surface fails; app stays installed |
 | Regions | v1 allocates whole surfaces (plane ids); no sub-surface split |
 | No geometry invention | Allocation never synthesises planes or fills low-confidence gaps |
@@ -70,7 +70,8 @@ pytest tests/test_app_compositor_lifecycle.py
 ```
 
 Covers two apps contending for one wall, optional missing-surface fallback,
-masking digest stability, and switch/pause handoff on sim presets.
+masking digest stability, and switch/pause handoff on sim presets. Bundled
+paint + ripples overlay: `tests/test_app_bundled_generation.py`.
 
 ## Licence
 

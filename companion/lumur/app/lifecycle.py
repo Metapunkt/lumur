@@ -127,12 +127,14 @@ class AppLifecycle:
         if record.state == AppState.PAUSED:
             return self.resume(app_id)
 
+        shares = list(record.manifest.get("shares") or [])
         owned = self.compositor.exclusive_owned_ids()
         try:
             fit = fit_app_to_room(
                 record.manifest,
                 self.room,
                 exclusive_owned=owned,
+                share_keys=set(shares),
                 raise_on_unmet=True,
             )
         except FitError as exc:
@@ -142,7 +144,6 @@ class AppLifecycle:
                 f"launch failed for {app_id}: {exc}", reason="unmet_surface"
             ) from exc
 
-        shares = list(record.manifest.get("shares") or [])
         try:
             self.compositor.claim_from_fit(
                 app_id, fit, shares=shares, as_overlay=as_overlay
@@ -202,12 +203,14 @@ class AppLifecycle:
             return self.launch(app_id, make_foreground=make_foreground)
 
         # Re-claim surfaces (may conflict if another app took them).
+        shares = list(record.manifest.get("shares") or [])
         owned = self.compositor.exclusive_owned_ids()
         try:
             fit = fit_app_to_room(
                 record.manifest,
                 self.room,
                 exclusive_owned=owned,
+                share_keys=set(shares),
                 raise_on_unmet=True,
             )
         except FitError as exc:
@@ -216,7 +219,6 @@ class AppLifecycle:
                 f"resume failed for {app_id}: {exc}", reason="unmet_surface"
             ) from exc
 
-        shares = list(record.manifest.get("shares") or [])
         try:
             self.compositor.claim_from_fit(app_id, fit, shares=shares)
         except CompositorError as exc:

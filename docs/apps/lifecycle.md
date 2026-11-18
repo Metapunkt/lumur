@@ -34,9 +34,11 @@ launcher.start("lumur.examples.ripples")
 ```
 
 - `list_startable()` omits apps with a non-null manifest `bridge` field so
-  bridge-hosted apps stay optional.
+  bridge-hosted apps stay optional (set `require_bridge=True` to include
+  Story Stage).
 - Starting a second app pauses the current foreground and launches/resumes
-  the target (`switch`).
+  the target (`switch`), except pure overlay apps (every surface key is in
+  `shares`) which launch concurrently — e.g. ripples over paint.
 
 Godot: `LumurLauncher` on `LumurRoomRuntime.launcher`.
 
