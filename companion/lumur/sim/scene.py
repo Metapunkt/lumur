@@ -10,7 +10,7 @@ import numpy as np
 
 from lumur.sim.devices import VirtualCamera, VirtualProjector
 from lumur.sim.geometry import Box, OccupantPlaceholder
-from lumur.sim.people import PeopleSim, people_from_config
+from lumur.sim.people import people_from_config
 from lumur.sim.room import Room, make_axis_room
 
 PRESETS_DIR = Path(__file__).resolve().parent / "presets"

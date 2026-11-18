@@ -15,7 +15,6 @@ from lumur.app import (
     ZoneAppSwitcher,
     ZoneSwitchConfig,
     build_app_manifest,
-    fit_app_to_room,
 )
 from lumur.audience import AudienceEvent, DwellGate
 from lumur.paint.export import export_godot_paint_assets

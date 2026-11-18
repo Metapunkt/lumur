@@ -6,8 +6,6 @@ import json
 import time
 from pathlib import Path
 
-import numpy as np
-import pytest
 
 from lumur.audience import AudienceDetector, AudienceEvent, FloorZone
 from lumur.events.udp_json import EventReceiver, EventSender, encode_event

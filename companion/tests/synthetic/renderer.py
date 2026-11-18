@@ -8,7 +8,7 @@ import numpy as np
 
 from lumur.capture.loop import CapturedFrame
 from lumur.decode.graycode import CorrespondenceMap
-from lumur.patterns.graycode import GrayCodeSequence, PatternFrame
+from lumur.patterns.graycode import GrayCodeSequence
 
 
 @dataclass(frozen=True)

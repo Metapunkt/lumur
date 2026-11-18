@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import numpy as np
-import pytest
 
 from lumur.calibrate.geometry import calibrate_plane_with_measured_distance
 from lumur.capture.loop import CaptureLoop

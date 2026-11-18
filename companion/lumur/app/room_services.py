@@ -12,8 +12,8 @@ from pathlib import Path
 from typing import Any
 
 from lumur.app.metrics import compute_surface_metrics
-from lumur.paint.export import assign_surface_roles
 from lumur.schema.room import load_room_package
+from lumur.surface_roles import assign_surface_roles, build_role_index
 
 
 @dataclass(frozen=True)
@@ -63,7 +63,7 @@ class RoomServices:
         doc, points, _projector_map = load_room_package(package_dir)
         planes = list(doc.get("planes") or [])
         roles_by_id = assign_surface_roles(planes)
-        role_index = _build_role_index(roles_by_id)
+        role_index = build_role_index(roles_by_id)
 
         metrics = compute_surface_metrics(points, planes, doc.get("floor_plane_id"))
         surfaces: list[SurfaceRecord] = []
@@ -156,14 +156,6 @@ class RoomServices:
     def generated_texture(self, key: str) -> dict[str, Any] | None:
         handle = self.generated_textures.get(key)
         return dict(handle) if isinstance(handle, dict) else None
-
-
-def _build_role_index(roles: dict[int, list[str]]) -> dict[str, int]:
-    index: dict[str, int] = {}
-    for pid, role_list in sorted(roles.items(), key=lambda kv: kv[0]):
-        for role in role_list:
-            index.setdefault(role, pid)
-    return index
 
 
 def _load_godot_side(

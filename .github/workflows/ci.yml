@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  python:
+    name: Python companion
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: companion
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+          pip install ruff
+
+      - name: Ruff
+        run: ruff check lumur lumur_synesyn tests
+
+      - name: Full pytest
+        run: pytest
+
+      - name: Isolated test modules
+        run: |
+          set -euo pipefail
+          for f in tests/test_*.py; do
+            echo "::group::pytest $f"
+            pytest "$f"
+            echo "::endgroup::"
+          done
+
+      - name: Console-script smoke (three presets)
+        run: |
+          set -euo pipefail
+          for scene in empty_room room_with_box noisy_room; do
+            echo "::group::smoke $scene"
+            work=$(mktemp -d)
+            lumur-calibrate --backend sim --scene "$scene" \
+              --distance-m 1.08 --point-a 31.2,17.2 --point-b 49.0,22.1 \
+              -o "$work/cal.json"
+            lumur-scan --backend sim --scene "$scene" \
+              --calibration "$work/cal.json" -o "$work/room"
+            lumur-export-godot "$work/room"
+            test -f "$work/room/godot/paint_manifest.json"
+            echo "::endgroup::"
+          done
+
+  godot:
+    name: Godot headless (optional)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Skip unless GODOT_BIN provided
+        run: |
+          if [ -z "${{ vars.GODOT_BIN || '' }}" ] && [ -z "${GODOT_BIN:-}" ]; then
+            echo "Godot headless tests skipped (no GODOT_BIN / tools/godot in CI)."
+            echo "Run locally: GODOT_BIN=/path/to/godot pytest companion/tests/test_paint.py -k godot"
+            exit 0
+          fi
+          echo "GODOT_BIN is set but this workflow does not download Godot yet; skipped."
