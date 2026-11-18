@@ -73,6 +73,18 @@ lumur-generate /tmp/sim-room --surface floor --comfy-url http://127.0.0.1:8188
 No Synesyn dependency. See
 [docs/companion/comfyui.md](../docs/companion/comfyui.md).
 
+## Optional Synesyn Hub bridge
+
+```bash
+pip install -e ".[synesyn]"   # marker extra; stdlib HTTP only
+lumur-generate-synesyn /tmp/sim-room --surface floor \
+  --hub-url http://127.0.0.1:8787 --comfy-url http://127.0.0.1:8188
+```
+
+Separate package `lumur_synesyn` + Godot addon `addons/lumur_synesyn/`.
+Core Lumur is unchanged without it. See
+[docs/bridge/synesyn.md](../docs/bridge/synesyn.md).
+
 ## Live calibration and scan
 
 See [docs/companion/calibration.md](../docs/companion/calibration.md) and

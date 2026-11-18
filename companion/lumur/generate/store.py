@@ -53,13 +53,14 @@ def write_provenance(
     result: SurfaceRenderResult,
     extra: dict[str, Any] | None = None,
 ) -> Path:
+    provider = str((result.meta or {}).get("provider") or (request.routing or {}).get("provider") or "comfyui")
     doc: dict[str, Any] = {
         "schema": PROVENANCE_SCHEMA,
         "schema_version": PROVENANCE_VERSION,
         "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "job_id": result.job_id,
         "status": result.status.value,
-        "provider": "comfyui",
+        "provider": provider,
         "prompt_id": result.prompt_id,
         "surface": request.surface.to_dict(),
         "preset_id": request.preset_id,
@@ -73,6 +74,16 @@ def write_provenance(
     }
     if extra:
         doc["extra"] = extra
+        # Promote known Synesyn Hub IDs beside Lumur provenance.
+        for key in (
+            "synesyn_job_id",
+            "synesyn_render_request_artifact_id",
+            "synesyn_image_artifact_ids",
+            "synesyn_workflow_artifact_id",
+            "synesyn_prompt_id",
+        ):
+            if key in extra and key not in doc:
+                doc[key] = extra[key]
     out = path / "provenance.json"
     out.write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8")
     return out

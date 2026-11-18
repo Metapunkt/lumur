@@ -209,6 +209,12 @@ tab, Story Catalyst, Story Stage). This PRD does not duplicate them.
 - **REQ-002-006:** All Synesyn integration in Lumur must live in a single
   Godot addon `lumur_synesyn` that depends on `synesyn_core`. Core Lumur
   addons must not import Synesyn types or call the Hub directly.
+  **Status (slice 2):** complete-in-sim — `addons/lumur_synesyn/` + optional
+  Python package `companion/lumur_synesyn/`; core `addons/lumur/**` and
+  `lumur.generate` do not import Synesyn / Hub. Live Godot
+  `HubSubstrateClient` remains optional when `synesyn_core` is installed;
+  Hub HTTP for generation is in the companion bridge (same pattern as
+  slice 1 ComfyUI).
 - **REQ-002-007:** `lumur_synesyn` must register an optional generator
   provider that submits `SynesynRenderRequestV1` to Hub `/render/submit`
   (via `HubSubstrateClient.submit_render` / `SynesynRenderService`),
@@ -217,9 +223,14 @@ tab, Story Catalyst, Story Stage). This PRD does not duplicate them.
   passes control images through `input_uploads` when needed, and maps
   completed `image.generated` artifacts onto surfaces through paint mode
   while retaining provenance.
+  **Status (slice 2):** complete-in-sim — `SynesynHubSurfaceGenerator` +
+  `lumur-generate-synesyn`; verified against mock Hub (submit, progress,
+  success, failure, timeout, auth, `input_uploads`, provenance IDs).
 - **REQ-002-008:** Switching between the standalone ComfyUI provider and
   the Hub provider must not require changes to paint mode or room-package
   consumers — only provider configuration.
+  **Status (slice 2):** complete-in-sim — both providers implement
+  `SurfaceGenerator`; paint still loads `generated_textures` only.
 
 ### Story Stage on surfaces
 
@@ -264,6 +275,10 @@ tab, Story Catalyst, Story Stage). This PRD does not duplicate them.
 - **REQ-002-014:** When the Hub provider or Story Stage bridge is active,
   the current room package (`lumur.room` and Godot paint export) must be
   registerable as a Hub artifact so spatial setup carries provenance.
+  **Status (slice 2):** complete-in-sim — `register_room_package` posts
+  `json.lumur_room` via Hub `POST /substrate/artifacts` (generic API).
+  Official type documentation remains a Synesyn-side touchpoint; Story
+  Stage / Story Log replay stays slice 4.
 - **REQ-002-015:** A Story Log plus its provenance sidecar, together with
   the registered room package, must be sufficient to replay dialogue and
   surface layout in the Lumur sim without live models or hardware
@@ -276,9 +291,11 @@ tab, Story Catalyst, Story Stage). This PRD does not duplicate them.
   xvfb), using a ComfyUI stub for standalone generation and a Synesyn Hub
   mock for bridge behaviour. Physical hardware validation is explicitly
   deferred.
-  **Status (slice 1):** complete-in-sim for REQs 001–005 —
-  `companion/tests/test_generate_comfyui.py` + mock ComfyUI server; Hub
-  mock deferred to slice 2.
+  **Status (slice 2):** complete-in-sim for REQs 001–008, 014 (room
+  registration) —
+  `companion/tests/test_generate_comfyui.py` +
+  `companion/tests/test_generate_synesyn_hub.py` (mock Hub). Story Stage /
+  steering / Story Log replay remain later slices.
 
 ## Acceptance
 
@@ -387,7 +404,9 @@ Synesyn code change is required**; Lumur adapts at the bridge boundary.
   (later slices); `SynesynRenderRequestV1` (upstream, slice 2+)
 - Architectural decision: ADR 0008, 0009, 0015, 0016
 - Implementation tracker: slice 1 in companion `lumur.generate` +
-  `addons/lumur` paint texture path
+  `addons/lumur` paint texture path; slice 2 in `lumur_synesyn` +
+  `addons/lumur_synesyn` ([bridge/synesyn.md](../bridge/synesyn.md))
 - Executable specification: `companion/tests/test_generate_comfyui.py`
-  (slice 1); further Godot headless / Hub mock tests per later slices
+  (slice 1); `companion/tests/test_generate_synesyn_hub.py` (slice 2 Hub
+  mock); further Godot headless tests per later slices
 - Founding notes: [scratchpad](../scratchpad.md)

@@ -123,8 +123,9 @@ progress). No physical projector or live ComfyUI required.
 
 ## Limitations
 
-- Slice 1 is **standalone only** — no Hub / SynPunkt / `lumur_synesyn`
-  (those are PRD-002 slices 2+).
+- This doc covers the **standalone** ComfyUI provider. The optional Hub
+  provider lives in [`docs/bridge/synesyn.md`](../bridge/synesyn.md)
+  (PRD-002 slice 2).
 - Local provenance JSON is not a Hub artifact; Hub provenance arrives with
   the optional Synesyn provider.
 - Godot texture sampling uses a fixed-size `Texture2DArray` (64² layers);
