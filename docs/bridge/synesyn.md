@@ -140,6 +140,11 @@ Synes-bot’s fork only.
 | HTTP download for artifact bytes when URI is not co-located `file://` (e.g. `GET /substrate/artifacts/{id}/content`) | Remote Hub installs cannot read Hub disk | **Needed** for non-local Hub; mock implements content route; co-located `file://` works as Synesyn does today |
 | No change to `/render/submit`, job shape, or `SynesynRenderRequestV1` | Bridge uses public contracts | **None required** |
 
+## Story Stage on surfaces
+
+Slice 3 (layer → surface mapping, stub + paint / sim verification):
+[story-stage.md](story-stage.md).
+
 ## Licence
 
 Companion / addon source: MIT. This document: CC BY-SA 4.0.

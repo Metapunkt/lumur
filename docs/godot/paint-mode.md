@@ -141,6 +141,13 @@ project.godot          demo project at repo root
 - **No mesh** — paint does not require one; a confidence-filtered mesh remains
   optional later work.
 
+## Story Stage textures
+
+Optional `lumur_synesyn` (PRD-002 slice 3) can push per-surface textures from
+Story Stage layers through the same `set_texture` / paint path. See
+[bridge/story-stage.md](../bridge/story-stage.md). Core paint mode does not
+import Synesyn.
+
 ## Licence
 
 Addon and demo source: MIT. This document: CC BY-SA 4.0.
