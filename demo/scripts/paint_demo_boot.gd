@@ -8,9 +8,7 @@ func _ready() -> void:
 	if runtime == null:
 		push_error("paint_demo_boot: parent is not LumurRoomRuntime")
 		return
-	var path := OS.get_environment("LUMUR_GODOT_ASSETS")
-	if path.is_empty():
-		path = "res://demo/fixtures/sample_room/godot"
+	var path := LumurDefaultAssets.resolve()
 	if not DirAccess.dir_exists_absolute(ProjectSettings.globalize_path(path)) \
 			and not DirAccess.dir_exists_absolute(path):
 		push_warning("No paint assets at %s — set LUMUR_GODOT_ASSETS" % path)

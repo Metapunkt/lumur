@@ -63,6 +63,9 @@ func load_room(path: String) -> Error:
 	if zone_switcher == null:
 		zone_switcher = LumurZoneAppSwitcher.new()
 	zone_switcher.bind_lifecycle(lifecycle)
+	var n_surfaces := package.list_surfaces().size()
+	var n_roles := package.list_roles().size()
+	print("Lumur: loaded %d surfaces / %d roles from %s" % [n_surfaces, n_roles, path])
 	return OK
 
 

@@ -82,7 +82,39 @@ def test_hub_config_from_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     assert cfg2.auth_enabled is False
 
 
+def test_hub_client_treats_ok_false_as_failure():
+    """HTTP 200 with JSON ``ok: false`` must raise HubError."""
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+    import threading
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):  # noqa: N802
+            body = b'{"ok": false, "error": "hub says no"}'
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, *_args):
+            return
+
+    server = HTTPServer(("127.0.0.1", 0), Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        host, port = server.server_address
+        client = SynesynHubClient(HubConfig(hub_base_url=f"http://{host}:{port}"))
+        from lumur_synesyn.hub_client import HubError
+
+        with pytest.raises(HubError, match="hub says no"):
+            client._request("GET", "/health")
+    finally:
+        server.shutdown()
+
+
 def test_synesyn_render_request_shape():
+
     req = SurfaceRenderRequest(
         surface=SurfaceTarget(role="floor", surface_id=1, width=64, height=48),
         routing={"mode": "hub", "provider": "comfyui", "hub_base_url": "http://h"},

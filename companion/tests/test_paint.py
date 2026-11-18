@@ -202,7 +202,7 @@ def test_godot_headless_paint_render(tmp_path: Path):
     godot = _find_godot()
     if godot is None:
         pytest.skip(
-            "Godot binary not found (set GODOT_BIN or place tools/godot). "
+            "Godot binary not found (set GODOT_BIN to a Godot 4 binary). "
             "Python reference paint tests still cover mapping; see docs/godot/paint-mode.md."
         )
 

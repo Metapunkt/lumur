@@ -4,9 +4,7 @@ extends Node
 ## (or a default), paint a calm floor, and listen for footstep UDP events.
 
 func _ready() -> void:
-	var assets := OS.get_environment("LUMUR_GODOT_ASSETS")
-	if assets.is_empty():
-		assets = "/tmp/sim-room/godot"
+	var assets := LumurDefaultAssets.resolve()
 	var runtime := $Runtime as LumurRoomRuntime
 	var err := runtime.load_room(assets)
 	if err != OK:

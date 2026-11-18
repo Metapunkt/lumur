@@ -93,11 +93,17 @@ def summarize_scan(
         notes.append("floor plane was not identified")
     if float(covered.mean()) < 0.2:
         notes.append("low geometric coverage; check decode contrast and pose")
-    notes.append(
-        "pose/translation direction is weakly constrained in purely planar "
-        "scenes; prefer room_with_box (or non-planar structure) when judging "
-        "metric depth accuracy"
-    )
+    # Planar-scene pose warning only when geometry looks single-plane dominant.
+    planar_kinds = [
+        p for p in segmentation.planes if p.kind in ("floor", "wall", "surface")
+    ]
+    non_planar = int(segmentation.non_planar_count or 0)
+    if len(planar_kinds) <= 2 and non_planar < max(20, int(0.02 * total)):
+        notes.append(
+            "pose/translation direction is weakly constrained in purely planar "
+            "scenes; prefer room_with_box (or non-planar structure) when judging "
+            "metric depth accuracy"
+        )
 
     conf_vals = conf[valid]
     return ScanReport(

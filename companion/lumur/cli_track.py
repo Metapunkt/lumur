@@ -30,7 +30,9 @@ def build_parser() -> argparse.ArgumentParser:
     return p
 
 
-def main(argv: list[str] | None = None) -> int:
+def _main(argv: list[str] | None = None) -> int:
+    import sys
+
     args = build_parser().parse_args(argv)
     rig = SimRig.from_scene_path(
         args.scene,
@@ -85,6 +87,13 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     sender = None if args.no_send else EventSender(host=args.host, port=args.port)
+    if sender is not None:
+        print(
+            f"warning: sending UDP to {args.host}:{args.port} with no listen "
+            "confirmation — start Godot LumurEventReceiver first "
+            "(UDP is fire-and-forget)",
+            file=sys.stderr,
+        )
     pw, ph = rig.projector_size
     silhouette = None
     if args.project_silhouette:
@@ -129,6 +138,12 @@ def main(argv: list[str] | None = None) -> int:
         sender.close()
     print(f"done frames={args.frames} footsteps={len(pipeline.events)}")
     return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    from lumur.cli_errors import run_cli
+
+    return run_cli(_main, argv)
 
 
 if __name__ == "__main__":

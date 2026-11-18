@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Lumur Python companion: structured-light calibration, scan, tracking, and ComfyUI generation"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = "MIT"
 dependencies = [
   "numpy>=1.24",
   "opencv-python-headless>=4.8",
@@ -23,12 +23,14 @@ yolo = ["ultralytics>=8.0"]
 synesyn = []
 
 [project.scripts]
+lumur = "lumur.cli_main:main"
 lumur-calibrate = "lumur.cli:main"
 lumur-scan = "lumur.cli_scan:main"
 lumur-export-godot = "lumur.cli_export_godot:main"
 lumur-track = "lumur.cli_track:main"
 lumur-generate = "lumur.cli_generate:main"
 lumur-generate-synesyn = "lumur_synesyn.cli:main"
+lumur-app = "lumur.cli_app:main"
 
 [tool.setuptools.packages.find]
 include = ["lumur*", "lumur_synesyn*"]

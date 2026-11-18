@@ -13,9 +13,7 @@ func _ready() -> void:
 	if runtime == null:
 		push_error("ripple_app: missing Runtime")
 		return
-	var assets := OS.get_environment("LUMUR_GODOT_ASSETS")
-	if assets.is_empty():
-		assets = "/tmp/sim-room/godot"
+	var assets := LumurDefaultAssets.resolve()
 	var err := runtime.load_room(assets)
 	if err != OK:
 		push_warning("ripple_app: could not load %s (err %s)" % [assets, err])

@@ -5,7 +5,7 @@ extends SceneTree
 ## Usage:
 ##   godot --headless --path . \
 ##     --script res://demo/scripts/headless_app_lifecycle.gd \
-##     -- --assets=/tmp/sim-room/godot
+##     -- --assets=demo/fixtures/sample_room/godot
 
 func _init() -> void:
 	call_deferred("_run")

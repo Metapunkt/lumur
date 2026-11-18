@@ -27,25 +27,38 @@ pytest
 
 ## Simulated projector–camera rig
 
+Use the **same** `--scene` for calibrate and scan (a mismatch prints a warning).
+Tape-measure pixels are for the 64×48 / 80×60 presets:
+
 ```bash
 lumur-calibrate --backend sim --scene empty_room \
   --distance-m 1.08 --point-a 31.2,17.2 --point-b 49.0,22.1 \
-  -o /tmp/sim-calibration.json
+  -o ../demo/fixtures/sample_room/calibration.json
 
-lumur-scan --backend sim --scene room_with_box \
-  --calibration /tmp/sim-calibration.json \
-  -o /tmp/sim-room
+lumur-scan --backend sim --scene empty_room \
+  --calibration ../demo/fixtures/sample_room/calibration.json \
+  -o ../demo/fixtures/sample_room
 ```
 
 Presets: `empty_room`, `room_with_box`, `noisy_room`, `room_with_walkers`. See
 [docs/companion/simulation.md](../docs/companion/simulation.md) and
 [docs/companion/room-scan.md](../docs/companion/room-scan.md).
+Root README has a full hardware-free sim quickstart.
 
 ## Godot paint export
 
 ```bash
-lumur-export-godot /tmp/sim-room
-# → /tmp/sim-room/godot/paint_manifest.json + PNG lookups
+lumur-export-godot ../demo/fixtures/sample_room
+# → …/godot/paint_manifest.json + PNG lookups
+```
+
+## App CLI
+
+```bash
+lumur-app check ../apps/paint/lumur.app.json
+lumur-app fit ../apps/paint/lumur.app.json --room ../demo/fixtures/sample_room
+lumur-app list --room ../demo/fixtures/sample_room
+lumur app fit ../apps/ripples/lumur.app.json --room ../demo/fixtures/sample_room
 ```
 
 See [docs/godot/paint-mode.md](../docs/godot/paint-mode.md) and

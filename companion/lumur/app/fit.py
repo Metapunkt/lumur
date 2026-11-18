@@ -2,6 +2,11 @@
 
 Slice 1 covers single-app fit: matching, constraints, required fail / optional
 null, deterministic preference. Multi-app ownership lives in later slices.
+
+Parity note: Godot mirrors this logic in ``addons/lumur/app_fit.gd``
+(``LumurAppFit``). Keep matching rules (role / kind / min_width_m /
+min_confidence / required) aligned when changing either side; there is no
+automated cross-language parity suite yet.
 """
 
 from __future__ import annotations
