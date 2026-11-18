@@ -5,9 +5,10 @@ extends Node
 ## surfaces by id or role. Owns the projector paint output when a
 ## ``LumurPaintMode`` child (or assigned node) is present.
 ##
-## PRD-003 slice 1 also exposes app-manifest load + room-fit against the
-## current package (ADR 0017 / 0018). Apps should ask for surfaces through
-## this facade rather than hard-coding projector pixels.
+## PRD-003 slices 1–3: app-manifest load + room-fit, filtered input bus,
+## compositor ownership, and install/launch/pause/switch lifecycle. Apps
+## should ask for surfaces through this facade rather than hard-coding
+## projector pixels.
 
 @export var godot_assets_path: String = ""
 @export var paint_path: NodePath
@@ -17,6 +18,10 @@ var paint: LumurPaintMode
 var app_manifest: LumurAppManifest
 var last_fit: Dictionary = {}
 var input_bus: LumurAppInputBus
+var compositor: LumurCompositor
+var lifecycle: LumurAppLifecycle
+var launcher: LumurLauncher
+var zone_switcher: LumurZoneAppSwitcher
 
 
 func _ready() -> void:
@@ -29,6 +34,11 @@ func _ready() -> void:
 		input_bus = LumurAppInputBus.new()
 		input_bus.name = "InputBus"
 		add_child(input_bus)
+	compositor = LumurCompositor.new()
+	lifecycle = LumurAppLifecycle.new()
+	launcher = LumurLauncher.new(lifecycle)
+	zone_switcher = LumurZoneAppSwitcher.new()
+	zone_switcher.bind_lifecycle(lifecycle)
 	if not godot_assets_path.is_empty():
 		load_room(godot_assets_path)
 
@@ -40,6 +50,19 @@ func load_room(path: String) -> Error:
 		return err
 	if paint != null:
 		paint.bind_package(package)
+	if compositor == null:
+		compositor = LumurCompositor.new()
+	compositor.confidence_threshold = package.confidence_threshold_default()
+	if lifecycle == null:
+		lifecycle = LumurAppLifecycle.new()
+	lifecycle.setup(package, input_bus, compositor)
+	if launcher == null:
+		launcher = LumurLauncher.new(lifecycle)
+	else:
+		launcher.bind(lifecycle)
+	if zone_switcher == null:
+		zone_switcher = LumurZoneAppSwitcher.new()
+	zone_switcher.bind_lifecycle(lifecycle)
 	return OK
 
 
@@ -181,6 +204,46 @@ func inject_app_event(event: Dictionary) -> Dictionary:
 	if input_bus == null:
 		return {}
 	return input_bus.inject(event)
+
+
+func install_app(path: String) -> Dictionary:
+	if lifecycle == null:
+		return {}
+	return lifecycle.install_file(path)
+
+
+func launch_app(app_id: String) -> Dictionary:
+	if lifecycle == null:
+		return {}
+	return lifecycle.launch(app_id)
+
+
+func pause_app(app_id: String) -> Dictionary:
+	if lifecycle == null:
+		return {}
+	# Clear paint before ownership release (cut handoff).
+	if paint != null and compositor != null:
+		compositor.clear_owned_paint(paint, app_id)
+	return lifecycle.pause(app_id)
+
+
+func switch_app(app_id: String) -> Dictionary:
+	if lifecycle == null:
+		return {}
+	return lifecycle.switch_to(app_id)
+
+
+func configure_zone_switch(config: Dictionary) -> void:
+	if zone_switcher == null:
+		return
+	zone_switcher.configure(config)
+	zone_switcher.attach_bus()
+
+
+func exclusive_owned_surface_ids() -> Array:
+	if compositor == null:
+		return []
+	return compositor.exclusive_owned_ids()
 
 
 signal footstep(event: Dictionary)

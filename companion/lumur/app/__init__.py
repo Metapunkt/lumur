@@ -1,5 +1,13 @@
-"""App-layer helpers: manifests, room services, fit, and input bus (PRD-003)."""
+"""App-layer helpers: manifests, room services, fit, input bus, compositor, lifecycle (PRD-003)."""
 
+from lumur.app.compositor import (
+    CompositeFrame,
+    Compositor,
+    CompositorError,
+    OwnershipEntry,
+    SurfaceClaim,
+    TransitionRecord,
+)
 from lumur.app.fit import (
     FitError,
     FitResult,
@@ -12,7 +20,10 @@ from lumur.app.input_bus import (
     AppInputSession,
     RefusedSubscription,
 )
+from lumur.app.launcher import Launcher
+from lumur.app.lifecycle import AppLifecycle, AppRecord, AppState, LifecycleError
 from lumur.app.room_services import RoomServices, SurfaceRecord
+from lumur.app.zone_switch import ZoneAppSwitcher, ZoneSwitchConfig
 from lumur.schema.app import (
     KNOWN_INPUTS,
     MANIFEST_FILENAME,
@@ -31,13 +42,26 @@ __all__ = [
     "MANIFEST_FILENAME",
     "AppInputBus",
     "AppInputSession",
+    "AppLifecycle",
+    "AppRecord",
+    "AppState",
+    "CompositeFrame",
+    "Compositor",
+    "CompositorError",
     "FitError",
     "FitResult",
+    "Launcher",
+    "LifecycleError",
+    "OwnershipEntry",
     "RefusedSubscription",
     "RoomServices",
     "SurfaceBinding",
+    "SurfaceClaim",
     "SurfaceRecord",
+    "TransitionRecord",
     "UnmetSurface",
+    "ZoneAppSwitcher",
+    "ZoneSwitchConfig",
     "build_app_manifest",
     "fit_app_to_room",
     "load_app_manifest",

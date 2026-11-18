@@ -18,8 +18,9 @@ and [PRD-002](docs/product-requirements/PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md)
 are **complete-in-sim** (calibrate → paint → ripples; generation, Synesyn
 bridge, Story Stage, opt-in audience steering / replay — all against the
 sim and mocks). [PRD-003](docs/product-requirements/PRD-003-LUMUR-OS-APPLICATION-LAYER.md)
-is in progress: **slices 1–2 (manifest + room fit; input permissions)
-complete-in-sim**; later slices cover compositor/lifecycle and bundled apps.
+is in progress: **slices 1–3 (manifest + room fit; input permissions;
+compositor + lifecycle/launcher) complete-in-sim**; slice 4 covers bundled
+apps + generation.
 Hardware validation is still pending. Founding intent:
 [scratchpad](docs/scratchpad.md),
 [ADRs](docs/architectural-decisions/README.md),
@@ -46,7 +47,10 @@ Audience steering:
 [`docs/bridge/audience-steering.md`](docs/bridge/audience-steering.md).
 Session / Story Log replay:
 [`docs/bridge/replay.md`](docs/bridge/replay.md). App manifests + room fit:
-[`docs/apps/manifest.md`](docs/apps/manifest.md).
+[`docs/apps/manifest.md`](docs/apps/manifest.md). Input permissions:
+[`docs/apps/input.md`](docs/apps/input.md). Compositor:
+[`docs/apps/compositor.md`](docs/apps/compositor.md). Lifecycle / launcher:
+[`docs/apps/lifecycle.md`](docs/apps/lifecycle.md).
 
 ## Licence
 

@@ -28,5 +28,5 @@ moved path, but the decision itself stands until a successor replaces it.
 | [0015](0015-single-lumur-synesyn-bridge.md) | Single `lumur_synesyn` bridge for Synesyn integration (render + Story Stage) | Accepted | 2026-11-18 |
 | [0016](0016-pluggable-surface-generators.md) | Pluggable surface generators; ComfyUI with or without Synesyn | Accepted | 2026-11-18 |
 | [0017](0017-app-manifest-format.md) | App manifest format and versioning (`lumur.app`) | Accepted | 2026-11-18 |
-| [0018](0018-surface-allocation-and-compositing.md) | Surface allocation and compositing rules | Proposed | 2026-11-18 |
+| [0018](0018-surface-allocation-and-compositing.md) | Surface allocation and compositing rules | Accepted | 2026-11-18 |
 | [0019](0019-app-input-permissions.md) | Per-app input permissions for room events | Accepted | 2026-11-18 |

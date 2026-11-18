@@ -2,7 +2,7 @@
 id: PRD-003
 title: Lumur OS application layer
 status: draft
-version: "0.2"
+version: "0.3"
 owner: Ayodele Arigbabu
 last_reviewed: 2026-11-18
 primary_users: [author, installer, visitor, workshop facilitator]
@@ -196,26 +196,38 @@ is explicitly out of scope — this PRD is the runtime those boots into.
   allocated surface or region, including exclusive ownership by default and
   explicit shared/layered cases when manifests allow it
   ([ADR 0018](../architectural-decisions/0018-surface-allocation-and-compositing.md)).
+  **Status (slice 3):** complete-in-sim — `Compositor` /
+  `LumurCompositor` ownership table; exclusive conflict; `shares` overlays.
 - **REQ-003-009:** Compositing must reuse paint-mode correspondence and
   confidence masking: low-confidence / invalid projector pixels stay
   unpainted; apps cannot override the confidence threshold to invent
   coverage ([paint-mode.md](../godot/paint-mode.md)).
+  **Status (slice 3):** complete-in-sim — compose via paint-mode maps;
+  masking digest; threshold cannot invent coverage.
 - **REQ-003-010:** When apps switch or pause, the compositor must hand off
   surface ownership with a defined transition (at least cut; crossfade
   optional) without stalling the projector path or requiring a room rescan.
+  **Status (slice 3):** complete-in-sim — deterministic cut on
+  pause/switch/stop; no rescan.
 
 ### Lifecycle and launcher
 
 - **REQ-003-011:** The runtime must support install (discover/register
   manifest + scene), launch, pause, resume, and stop for an app against a
   loaded room package, with observable state in sim.
+  **Status (slice 3):** complete-in-sim — `AppLifecycle` /
+  `LumurAppLifecycle`; paused apps receive no input-bus events.
 - **REQ-003-012:** A simple launcher must list installed apps and start one
   (headless API required; a minimal on-projector UI is allowed but not
   required for complete-in-sim).
+  **Status (slice 3):** complete-in-sim — `Launcher` / `LumurLauncher`
+  discover + list + start.
 - **REQ-003-013:** Optionally, standing in a configured floor zone for a
   dwell time may switch the active app. Zone→app mapping is configuration,
   not hard-coded in apps. Absent that configuration, zones do not switch
   apps (they may still feed permitted inputs).
+  **Status (slice 3):** complete-in-sim — `ZoneAppSwitcher` /
+  `LumurZoneAppSwitcher` with shared `DwellGate` (passers-by rejected).
 
 ### Generation from apps
 
@@ -240,9 +252,9 @@ is explicitly out of scope — this PRD is the runtime those boots into.
   headlessly with the existing sim (`--backend sim` presets), companion
   tests, and/or Godot headless / xvfb. Physical projector/webcam validation
   is deferred. Owner acceptance for this PRD does not depend on hardware.
-  **Status (slice 1–2):** complete-in-sim for REQs 001–007 —
-  `test_app_manifest_fit.py` + `test_app_input_permissions.py` on sim
-  presets / walking figures (no hardware).
+  **Status (slice 1–3):** complete-in-sim for REQs 001–013 —
+  `test_app_manifest_fit.py` + `test_app_input_permissions.py` +
+  `test_app_compositor_lifecycle.py` on sim presets (no hardware).
 
 ## Acceptance
 
@@ -262,9 +274,15 @@ Automated (target, as slices land):
   `LumurAppInputBus` / `demo/scripts/headless_app_input.gd`.
 - Two apps sequentially or concurrently on disjoint surfaces; confidence
   mask still drops invalid pixels; switch/pause handoff (REQ-003-008–011).
+  **Done (slice 3):** `test_app_compositor_lifecycle.py` (contention,
+  masking digest, pause silence, cut handoff).
 - Launcher lists and starts bundled apps headlessly (REQ-003-012, 015).
+  **Done (slice 3)** for discover/list/start of example manifests
+  (REQ-003-015 full bundled scenes → slice 4).
 - Zone→app switch with dwell when configured; no switch when not
   (REQ-003-013).
+  **Done (slice 3):** dwell / debounce; passers-by rejected; absent config
+  is a no-op.
 - App generation request with null / ComfyUI stub provider; no Synesyn
   imports under `addons/lumur/**` (REQ-003-014, 016).
 - Story Stage app entry appears only with bridge enabled (REQ-003-016).
