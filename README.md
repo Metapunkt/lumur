@@ -14,12 +14,12 @@ apps that target named surfaces, so the same app can be installed in another
 room.
 
 **Status:** [PRD-001](docs/product-requirements/PRD-001-CALIBRATE-PAINT-RIPPLE.md)
-is **complete-in-sim** (calibrate → scan → paint → footstep ripples against
-the simulated projector–camera rig). [PRD-002](docs/product-requirements/PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md)
-is **complete-in-sim** (slices 1–4): standalone ComfyUI generation, optional
-Synesyn Hub bridge, Story Stage layer→surface mapping, opt-in audience
-steering, and Story Log / session replay (`lumur_synesyn`), all against
-mocks / stubs. Hardware validation is still pending. Founding intent:
+and [PRD-002](docs/product-requirements/PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md)
+are **complete-in-sim** (calibrate → paint → ripples; generation, Synesyn
+bridge, Story Stage, opt-in audience steering / replay — all against the
+sim and mocks). [PRD-003](docs/product-requirements/PRD-003-LUMUR-OS-APPLICATION-LAYER.md)
+is a **draft** for the application layer (manifests, compositor, lifecycle).
+Hardware validation is still pending. Founding intent:
 [scratchpad](docs/scratchpad.md),
 [ADRs](docs/architectural-decisions/README.md),
 [PRDs](docs/product-requirements/README.md).

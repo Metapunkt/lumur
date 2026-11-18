@@ -1,9 +1,10 @@
 # 0014 — Local UDP JSON for companion → Godot events
 
-- **Status:** Accepted
+- **Status:** Accepted (refined by [ADR 0019](0019-app-input-permissions.md)
+  for per-app delivery filtering; transport unchanged)
 - **Date:** 2026-11-18
 - **Area:** runtime / interchange / interaction
-- **Relates to:** ADR 0004, ADR 0005, ADR 0006; PRD-001
+- **Relates to:** ADR 0004, ADR 0005, ADR 0006, ADR 0019; PRD-001, PRD-003
 
 ## Context
 

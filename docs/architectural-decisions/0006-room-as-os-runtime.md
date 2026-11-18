@@ -1,9 +1,11 @@
 # 0006 — Lumur is a runtime for rooms
 
-- **Status:** Accepted
+- **Status:** Accepted (refined by [ADR 0017](0017-app-manifest-format.md),
+  [ADR 0018](0018-surface-allocation-and-compositing.md),
+  [ADR 0019](0019-app-input-permissions.md))
 - **Date:** 2026-11-18
 - **Area:** runtime / product
-- **Relates to:** ADR 0004, ADR 0007, ADR 0009
+- **Relates to:** ADR 0004, ADR 0007, ADR 0009, ADR 0017, ADR 0018, ADR 0019
 
 ## Context
 

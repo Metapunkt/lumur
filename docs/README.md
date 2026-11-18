@@ -9,7 +9,8 @@ Pick the documentation pathway that best describes your needs.
 - [Product requirements](product-requirements/README.md) — what each
   milestone must do, and how success is measured ([PRD-001](product-requirements/PRD-001-CALIBRATE-PAINT-RIPPLE.md)
   and [PRD-002](product-requirements/PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md)
-  complete-in-sim).
+  complete-in-sim; [PRD-003](product-requirements/PRD-003-LUMUR-OS-APPLICATION-LAYER.md)
+  draft: application layer).
 - [Architectural decisions](architectural-decisions/README.md) — why it is
   built this way. Append-only, including the decisions we reverse.
 
@@ -55,6 +56,12 @@ Opt-in audience steering (PRD-002 slice 4):
 
 Session / Story Log replay (PRD-002 slice 4):
 [bridge/replay.md](bridge/replay.md).
+
+Next product intent (application layer — manifests, compositor, lifecycle):
+[PRD-003](product-requirements/PRD-003-LUMUR-OS-APPLICATION-LAYER.md),
+[ADR 0017](architectural-decisions/0017-app-manifest-format.md),
+[ADR 0018](architectural-decisions/0018-surface-allocation-and-compositing.md),
+[ADR 0019](architectural-decisions/0019-app-input-permissions.md).
 
 ## Credit and licence
 
