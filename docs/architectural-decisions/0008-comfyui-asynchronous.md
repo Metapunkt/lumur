@@ -1,9 +1,9 @@
 # 0008 — ComfyUI sits beside the renderer, never on its critical path
 
-- **Status:** Accepted
+- **Status:** Accepted (refined by [ADR 0016](0016-pluggable-surface-generators.md))
 - **Date:** 2026-11-18
 - **Area:** content / generation
-- **Relates to:** ADR 0003, ADR 0004, ADR 0006
+- **Relates to:** ADR 0003, ADR 0004, ADR 0006, ADR 0015, ADR 0016
 
 ## Context
 
@@ -42,3 +42,14 @@ stays separate from the geometric foundation in the room package.
 - Follow-up: the first milestone does not require a working ComfyUI
   integration. When it arrives, it needs its own PRD and a test that
   generation can fail without interrupting projection.
+
+## Amendment — 2026-11-18
+
+The async / optional / off-critical-path decision stands. **How** generation
+attaches is refined in [ADR 0016](0016-pluggable-surface-generators.md): a
+pluggable generator interface in Lumur core, a first-class standalone
+ComfyUI provider (no Synesyn dependency), and an optional Synesyn Hub
+provider inside `lumur_synesyn` only ([ADR 0015](0015-single-lumur-synesyn-bridge.md),
+[PRD-002](../product-requirements/PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md)).
+Do not read this ADR as requiring Synesyn for ComfyUI, or as forbidding a
+direct ComfyUI path in standalone installs.

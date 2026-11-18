@@ -4,7 +4,12 @@ Founding brainstorm, recorded 18 November 2026 (Europe/Oslo). This is a
 working notebook, not a source of truth. Decisions live in
 [architectural decisions](architectural-decisions/README.md); product intent
 for the first build lives in
-[PRD-001](product-requirements/PRD-001-CALIBRATE-PAINT-RIPPLE.md).
+[PRD-001](product-requirements/PRD-001-CALIBRATE-PAINT-RIPPLE.md)
+(complete-in-sim). Generation, the optional Synesyn bridge, and Story Stage
+on surfaces are drafted in
+[PRD-002](product-requirements/PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md)
+([ADR 0015](architectural-decisions/0015-single-lumur-synesyn-bridge.md),
+[ADR 0016](architectural-decisions/0016-pluggable-surface-generators.md)).
 
 ## Origin
 
@@ -220,7 +225,10 @@ Ideas in play, none of them required for Lumur's first milestone:
 
 Lumur must remain a standalone runtime that Synesyn *uses*. People who
 want interactive walls should never need the Hub or the agent stack. The
-join is a thin bridge addon.
+join is a thin bridge addon (`lumur_synesyn`; ADR 0015). ComfyUI surface
+generation is **not** Synesyn-only: core owns a generator interface and a
+first-class direct-ComfyUI provider; the Hub route is an optional second
+provider inside the bridge (ADR 0016, refining ADR 0008).
 
 ## Proposed first build
 
@@ -239,9 +247,13 @@ A suggested sequence, later refined in PRD-001:
    library; the renderer does not depend on Python inference or ComfyUI.
 4. Interaction — floor ripples; measure end-to-end latency and false
    triggers under the actual projected content.
-5. ComfyUI — asynchronous surface-texture generation; failure or
-   disconnection must not interrupt projection.
-6. Extensions — optional pose refinements, segmentation, viewer tracking,
+5. ComfyUI — asynchronous surface-texture generation via a pluggable
+   provider (standalone direct ComfyUI first; optional Synesyn Hub
+   provider in `lumur_synesyn`); failure or disconnection must not
+   interrupt projection. See PRD-002 / ADR 0016.
+6. Synesyn bridge — Story Stage on surfaces, opt-in audience steering,
+   room package + Story Log replay (PRD-002 slices 2–4).
+7. Extensions — optional pose refinements, segmentation, viewer tracking,
    additional projectors; each with its own accuracy and performance tests.
 
 Postponed: dense live reconstruction, multi-person viewpoint correction,

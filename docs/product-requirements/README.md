@@ -12,6 +12,7 @@ specs, instead of copying them.
 | ID | Product flow | Status | Last reviewed |
 |---|---|---|---|
 | [PRD-001](PRD-001-CALIBRATE-PAINT-RIPPLE.md) | Calibrate, paint the room, and footstep ripples | complete-in-sim (v0.4; hardware validation pending) | 2026-11-18 |
+| [PRD-002](PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md) | Surface generation, Synesyn bridge, and Story Stage on Lumur | draft (v0.1) | 2026-11-18 |
 
 ## Lifecycle
 

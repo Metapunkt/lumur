@@ -78,8 +78,10 @@ remain a mapped artwork.
   ([ADR 0007](../architectural-decisions/0007-lumur-os-as-appliance.md)).
 - Multi-app compositing, automatic room semantics, and a second camera.
 - A working ComfyUI integration (the renderer must already tolerate its
-  absence; the integration itself is a later PRD).
-- Synesyn bridge features, including Story Stage on Lumur.
+  absence; the integration itself is
+  [PRD-002](PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md)).
+- Synesyn bridge features, including Story Stage on Lumur
+  ([PRD-002](PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md)).
 
 ## Critical journey
 

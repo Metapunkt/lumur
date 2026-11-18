@@ -8,8 +8,10 @@ Lumur is in design phase; there is no software to install yet.
 
 - [Scratchpad](scratchpad.md) — the founding brainstorm, dated 2026-11-18,
   including the naming journey and open questions.
-- [Product requirements](product-requirements/README.md) — what the first
-  milestone must do, and how success is measured.
+- [Product requirements](product-requirements/README.md) — what each
+  milestone must do, and how success is measured ([PRD-001](product-requirements/PRD-001-CALIBRATE-PAINT-RIPPLE.md)
+  complete-in-sim; [PRD-002](product-requirements/PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md)
+  draft: generation, Synesyn bridge, Story Stage).
 - [Architectural decisions](architectural-decisions/README.md) — why it is
   built this way. Append-only, including the decisions we reverse.
 
@@ -40,6 +42,12 @@ Tracking / footsteps (pose, subtraction mask, UDP events):
 
 Footstep ripples in Godot:
 [godot/ripples.md](godot/ripples.md).
+
+Next product intent (generation providers, optional Synesyn bridge, Story
+Stage on surfaces):
+[PRD-002](product-requirements/PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md),
+[ADR 0015](architectural-decisions/0015-single-lumur-synesyn-bridge.md),
+[ADR 0016](architectural-decisions/0016-pluggable-surface-generators.md).
 
 Further user guides, a developer guide, and implementation contracts will
 appear here as the runtime grows.
