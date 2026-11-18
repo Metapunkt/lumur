@@ -16,13 +16,17 @@ room.
 **Status:** early implementation. Founding intent lives in the
 [scratchpad](docs/scratchpad.md),
 [architectural decisions](docs/architectural-decisions/README.md) and
-[product requirements](docs/product-requirements/README.md). The first code
-slice is the Python calibration companion under [`companion/`](companion/).
+[product requirements](docs/product-requirements/README.md). Code so far:
+the Python companion under [`companion/`](companion/) (calibrate, sim, room
+scan, Godot paint export) and the Godot 4 addon under
+[`addons/lumur/`](addons/lumur/).
 
 ## Documentation
 
-Start at [`docs/`](docs/README.md). Calibration runbook and JSON schema:
-[`docs/companion/calibration.md`](docs/companion/calibration.md).
+Start at [`docs/`](docs/README.md). Calibration:
+[`docs/companion/calibration.md`](docs/companion/calibration.md). Room scan:
+[`docs/companion/room-scan.md`](docs/companion/room-scan.md). Paint mode:
+[`docs/godot/paint-mode.md`](docs/godot/paint-mode.md).
 
 ## Licence
 

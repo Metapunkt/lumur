@@ -142,6 +142,16 @@ Printed by `lumur-scan` and stored under `report` in `room.json`:
    instead of bridging gaps.
 5. Write the room package.
 
+## Godot paint export
+
+After a scan, export PNG lookup textures for the Godot addon
+([ADR 0013](../architectural-decisions/0013-godot-paint-asset-export.md),
+[paint-mode.md](../godot/paint-mode.md)):
+
+```bash
+lumur-export-godot /tmp/sim-room
+```
+
 ## Limitations
 
 - **Planar pose ambiguity.** Homography-based calibration on a mostly planar

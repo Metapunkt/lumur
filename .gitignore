@@ -16,3 +16,8 @@ venv/
 Thumbs.db
 *~
 *.swp
+tools/godot
+tools/Godot*
+
+# Godot import cache
+*.import

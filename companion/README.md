@@ -38,6 +38,16 @@ Presets: `empty_room`, `room_with_box`, `noisy_room`. See
 [docs/companion/simulation.md](../docs/companion/simulation.md) and
 [docs/companion/room-scan.md](../docs/companion/room-scan.md).
 
+## Godot paint export
+
+```bash
+lumur-export-godot /tmp/sim-room
+# → /tmp/sim-room/godot/paint_manifest.json + PNG lookups
+```
+
+See [docs/godot/paint-mode.md](../docs/godot/paint-mode.md) and
+[ADR 0013](../docs/architectural-decisions/0013-godot-paint-asset-export.md).
+
 ## Live calibration and scan
 
 See [docs/companion/calibration.md](../docs/companion/calibration.md) and

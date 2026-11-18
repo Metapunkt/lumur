@@ -1,0 +1,29 @@
+; Engine configuration file.
+; Godot 4.3 demo for Lumur paint-the-room mode.
+
+config_version=5
+
+[application]
+
+config/name="Lumur Paint Demo"
+config/description="Minimal projector paint demo for the Lumur addon."
+run/main_scene="res://demo/scenes/paint_demo.tscn"
+config/features=PackedStringArray("4.3")
+config/icon="res://icon.svg"
+
+[display]
+
+window/size/viewport_width=64
+window/size/viewport_height=48
+window/size/window_width_override=640
+window/size/window_height_override=480
+window/stretch/mode="viewport"
+
+[editor_plugins]
+
+enabled=PackedStringArray("lumur")
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+textures/vram_compression/import_etc2_astc=false
