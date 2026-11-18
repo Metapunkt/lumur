@@ -52,9 +52,8 @@ class Box:
 class OccupantPlaceholder:
     """Static stand-in for a person (cylinder-ish AABB).
 
-    Pose estimation is intentionally not implemented here; later PRD-001
-    work can replace these with animated figures / occluders without
-    changing the renderer entry points.
+    Prefer ``AnimatedPerson`` / ``PeopleSim`` for pose and footstep work;
+    placeholders remain valid as simple occluders in older presets.
     """
 
     center: np.ndarray  # base centre at floor height typically
@@ -71,6 +70,27 @@ class OccupantPlaceholder:
             albedo=self.albedo,
             name=self.name,
         )
+
+
+@dataclass(frozen=True)
+class Sphere:
+    """Diffuse sphere for joints / heads."""
+
+    center: np.ndarray
+    radius: float
+    albedo: float = 0.35
+    name: str = "sphere"
+
+
+@dataclass(frozen=True)
+class Capsule:
+    """Line segment with radius — limbs of articulated sim people."""
+
+    a: np.ndarray
+    b: np.ndarray
+    radius: float
+    albedo: float = 0.35
+    name: str = "capsule"
 
 
 def make_look_at(
@@ -151,6 +171,79 @@ def intersect_rays_box(
     t_exit = np.min(tmax, axis=1)
     hit = (t_exit >= t_enter) & (t_enter > 1e-8)
     t = np.where(hit, t_enter, np.inf)
+    points = origins + directions * t[:, None]
+    points = np.where(np.isfinite(t)[:, None], points, np.nan)
+    return points, t
+
+
+def intersect_rays_sphere(
+    origins: np.ndarray,
+    directions: np.ndarray,
+    sphere: Sphere,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Ray–sphere intersection (nearest positive root)."""
+    oc = origins - np.asarray(sphere.center, dtype=np.float64)
+    # |o + t d - c|^2 = r^2; d is unit length → a = 1
+    b = 2.0 * np.sum(oc * directions, axis=1)
+    c = np.sum(oc * oc, axis=1) - float(sphere.radius) ** 2
+    disc = b * b - 4.0 * c
+    t = np.full(origins.shape[0], np.inf, dtype=np.float64)
+    ok = disc >= 0.0
+    sqrt_disc = np.sqrt(np.where(ok, disc, 0.0))
+    t0 = (-b - sqrt_disc) * 0.5
+    t1 = (-b + sqrt_disc) * 0.5
+    cand = np.where(t0 > 1e-8, t0, t1)
+    keep = ok & (cand > 1e-8)
+    t = np.where(keep, cand, np.inf)
+    points = origins + directions * t[:, None]
+    points = np.where(np.isfinite(t)[:, None], points, np.nan)
+    return points, t
+
+
+def intersect_rays_capsule(
+    origins: np.ndarray,
+    directions: np.ndarray,
+    capsule: Capsule,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Ray–capsule: finite cylinder plus spherical caps."""
+    a = np.asarray(capsule.a, dtype=np.float64)
+    b = np.asarray(capsule.b, dtype=np.float64)
+    r = float(capsule.radius)
+    ab = b - a
+    ab_len = float(np.linalg.norm(ab))
+    if ab_len < 1e-9:
+        return intersect_rays_sphere(
+            origins, directions, Sphere(center=a, radius=r, albedo=capsule.albedo)
+        )
+    ab_u = ab / ab_len
+
+    # Cylinder infinite then clip to segment; also test end spheres.
+    # Solve | (o + t d - a) × ab_u |^2 = r^2 with component along ab excluded.
+    oa = origins - a
+    # Cross product oa×ab_u and d×ab_u
+    d_x = np.cross(directions, ab_u)
+    oa_x = np.cross(oa, ab_u)
+    A = np.sum(d_x * d_x, axis=1)
+    B = 2.0 * np.sum(d_x * oa_x, axis=1)
+    C = np.sum(oa_x * oa_x, axis=1) - r * r
+    disc = B * B - 4.0 * A * C
+    t_cyl = np.full(origins.shape[0], np.inf, dtype=np.float64)
+    solvable = (disc >= 0.0) & (A > 1e-12)
+    sqrt_disc = np.sqrt(np.where(solvable, disc, 0.0))
+    for sign in (-1.0, 1.0):
+        t_cand = (-B + sign * sqrt_disc) / np.where(solvable, 2.0 * A, 1.0)
+        hit_pt = origins + directions * t_cand[:, None]
+        proj = np.sum((hit_pt - a) * ab_u, axis=1)
+        on_seg = (proj >= 0.0) & (proj <= ab_len) & (t_cand > 1e-8) & solvable
+        t_cyl = np.where(on_seg & (t_cand < t_cyl), t_cand, t_cyl)
+
+    t_a = intersect_rays_sphere(
+        origins, directions, Sphere(center=a, radius=r)
+    )[1]
+    t_b = intersect_rays_sphere(
+        origins, directions, Sphere(center=b, radius=r)
+    )[1]
+    t = np.minimum(np.minimum(t_cyl, t_a), t_b)
     points = origins + directions * t[:, None]
     points = np.where(np.isfinite(t)[:, None], points, np.nan)
     return points, t

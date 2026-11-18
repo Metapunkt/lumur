@@ -1,8 +1,8 @@
 ---
 id: PRD-001
 title: Calibrate, paint the room, and footstep ripples
-status: draft
-version: "0.2"
+status: complete-in-sim
+version: "0.4"
 owner: Ayodele Arigbabu
 last_reviewed: 2026-11-18
 primary_users: [installer, author, visitor]
@@ -141,12 +141,25 @@ exists, not in a second copy of this journey.
   assets; no companion socket or ComfyUI on the critical path.
 - **REQ-001-008:** Footstep ripples must be driven by ankle joints
   detected on the raw webcam frame and ray-cast onto the scanned floor.
+  **Status (2026-11-18):** Complete in sim — oracle/optional pose on raw
+  frames, ByteTrack-style IDs, ankle→floor events, UDP JSON into Godot
+  ripple overlay ([tracking.md](../companion/tracking.md),
+  [ripples.md](../godot/ripples.md),
+  [ADR 0014](../architectural-decisions/0014-udp-json-event-transport.md)).
+  Hardware validation pending.
 - **REQ-001-009:** Setup must include a way to lock camera exposure and
   white balance. If a predicted-frame subtraction mask is present, it
   must be used to filter detections, not as the image the pose model
   sees.
+  **Status (2026-11-18):** Complete in sim — locked AE/AWB on sim camera;
+  radiometric calibration + latency ring buffer; subtraction filters
+  detections only ([tracking.md](../companion/tracking.md), ADR 0005).
 - **REQ-001-010:** End-to-end ripple latency and false-trigger rate must
   be measurable under the projected content actually being shown.
+  **Status (2026-11-18):** Measurable in sim — injected projected
+  silhouettes rejected; footstep errors vs ground truth; UDP e2e mock;
+  `lumur-track` reports counts. Live hardware latency/false-trigger
+  logging remains pending.
 
 ## Acceptance
 
@@ -163,6 +176,16 @@ Automated coverage (companion, simulated rig):
   colour landing on the correct surfaces; optional Godot headless PNG
   when a binary is available (REQ-001-005, REQ-001-006, REQ-001-007) —
   `companion/tests/test_paint.py`.
+- Predicted-frame subtraction rejecting projected-content false
+  detections; footstep positions vs sim ground truth; stable IDs for
+  2–4 crossing walkers; UDP event stream into a Python mock Godot
+  receiver (REQ-001-008, REQ-001-009, REQ-001-010) —
+  `companion/tests/test_tracking.py`.
+
+**Milestone status (2026-11-18):** **complete-in-sim.** All PRD-001
+requirements have automated companion coverage against the simulated
+rig. Hardware projector/webcam validation and live latency / false-trigger
+measurement remain open.
 
 Manual coverage, when hardware begins:
 
@@ -190,38 +213,40 @@ Manual coverage, when hardware begins:
 - [ADR 0011: simulated projector–camera rig](../architectural-decisions/0011-simulated-projector-camera-rig.md)
 - [ADR 0012: versioned room package](../architectural-decisions/0012-versioned-room-package.md)
 - [ADR 0013: Godot paint asset export](../architectural-decisions/0013-godot-paint-asset-export.md)
+- [ADR 0014: UDP JSON event transport](../architectural-decisions/0014-udp-json-event-transport.md)
 
 Companion runbooks: [calibration.md](../companion/calibration.md),
 [room-scan.md](../companion/room-scan.md),
-[simulation.md](../companion/simulation.md).
+[simulation.md](../companion/simulation.md),
+[tracking.md](../companion/tracking.md).
 
-Godot paint runbook: [paint-mode.md](../godot/paint-mode.md).
+Godot runbooks: [paint-mode.md](../godot/paint-mode.md),
+[ripples.md](../godot/ripples.md).
 
 ## Open questions and risks
 
-- Target Godot 4 minor version is unset.
 - Recommended webcam and projector hardware is unset.
-- Pose model and tracker are unset (MediaPipe, YOLO-pose, ByteTrack were
-  examples only).
-- Whether the Python companion later becomes a GDExtension is open, and
-  must not block this milestone.
+- Real pose backend choice on hardware (MediaPipe vs YOLO-pose) remains
+  open; both are optional extras. Sim uses the oracle detector.
+- Whether the Python companion later becomes a GDExtension is open.
 - Radiometric calibration quality, and webcam latency, may limit how
-  useful the subtraction mask is; the journey is valid without it.
-- Single-camera occlusion and identity swaps are accepted risks for this
-  milestone.
+  useful the subtraction mask is on real hardware.
+- Single-camera occlusion and identity swaps are accepted risks.
 - Licence is decided: MIT for source code, CC BY-SA 4.0 for text and
-  documentation. See [`LICENSE`](../../LICENSE). The public
-  Metapunkt/lumur repository had not yet been created when this PRD was
-  written; see the [scratchpad](../scratchpad.md#open-questions).
+  documentation. See [`LICENSE`](../../LICENSE).
 
 ## Evidence map
 
 - User workflow: [calibration.md](../companion/calibration.md),
-  [room-scan.md](../companion/room-scan.md)
-- Normative contract: `lumur.calibration` v1.0 and `lumur.room` v1.0
-  schemas (documented in the runbooks; ADR 0012)
-- Architectural decisions: ADR 0002, 0003, 0004, 0005, 0006, 0008, 0011, 0012
+  [room-scan.md](../companion/room-scan.md),
+  [tracking.md](../companion/tracking.md),
+  [paint-mode.md](../godot/paint-mode.md),
+  [ripples.md](../godot/ripples.md)
+- Normative contract: `lumur.calibration` v1.0, `lumur.room` v1.0,
+  `lumur.event` v1.0 (ADR 0012, ADR 0014)
+- Architectural decisions: ADR 0002–0006, 0008, 0011–0014
 - Implementation tracker: none
 - Executable specification: `companion/tests/test_sim_e2e.py`,
-  `companion/tests/test_room_scan.py`
+  `companion/tests/test_room_scan.py`, `companion/tests/test_paint.py`,
+  `companion/tests/test_tracking.py`
 - Founding notes: [scratchpad](../scratchpad.md)

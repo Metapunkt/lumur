@@ -10,9 +10,12 @@ uniform sampler2D confidence_tex : filter_nearest, repeat_disable;
 uniform sampler2D lookup_tex : filter_nearest, repeat_disable;
 uniform sampler2D palette_tex : filter_nearest, repeat_disable;
 uniform sampler2D mode_tex : filter_nearest, repeat_disable; // R: mode id/255
+uniform sampler2D ripple_tex : filter_linear, repeat_disable;
 uniform float confidence_threshold = 0.05;
 uniform float time_seconds = 0.0;
 uniform vec4 clear_color = vec4(0.0, 0.0, 0.0, 1.0);
+uniform float ripple_floor_id = -1.0;
+uniform bool ripple_enabled = false;
 
 const float MODE_PULSE = 2.0;
 
@@ -33,5 +36,9 @@ void fragment() {
 		lit = base.rgb * amp;
 	}
 
-	COLOR = ok ? vec4(lit, 1.0) : clear_color;
+	vec4 ripple = texture(ripple_tex, uv);
+	bool on_floor = ripple_enabled && ripple_floor_id >= 0.5 && abs(sid - ripple_floor_id) < 0.5;
+	vec3 with_ripple = mix(lit, ripple.rgb, on_floor ? ripple.a : 0.0);
+
+	COLOR = ok ? vec4(with_ripple, 1.0) : clear_color;
 }

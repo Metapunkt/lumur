@@ -13,20 +13,24 @@ only the interactions that matter, and renders continuously. Experiences are
 apps that target named surfaces, so the same app can be installed in another
 room.
 
-**Status:** early implementation. Founding intent lives in the
-[scratchpad](docs/scratchpad.md),
-[architectural decisions](docs/architectural-decisions/README.md) and
-[product requirements](docs/product-requirements/README.md). Code so far:
-the Python companion under [`companion/`](companion/) (calibrate, sim, room
-scan, Godot paint export) and the Godot 4 addon under
-[`addons/lumur/`](addons/lumur/).
+**Status:** [PRD-001](docs/product-requirements/PRD-001-CALIBRATE-PAINT-RIPPLE.md)
+is **complete-in-sim** (calibrate → scan → paint → footstep ripples against
+the simulated projector–camera rig). Hardware validation is still pending.
+Founding intent: [scratchpad](docs/scratchpad.md),
+[ADRs](docs/architectural-decisions/README.md),
+[PRDs](docs/product-requirements/README.md).
+
+Code: Python companion [`companion/`](companion/) (calibrate, sim, room scan,
+paint export, tracking) and Godot 4 addon [`addons/lumur/`](addons/lumur/).
 
 ## Documentation
 
 Start at [`docs/`](docs/README.md). Calibration:
 [`docs/companion/calibration.md`](docs/companion/calibration.md). Room scan:
-[`docs/companion/room-scan.md`](docs/companion/room-scan.md). Paint mode:
-[`docs/godot/paint-mode.md`](docs/godot/paint-mode.md).
+[`docs/companion/room-scan.md`](docs/companion/room-scan.md). Tracking:
+[`docs/companion/tracking.md`](docs/companion/tracking.md). Paint:
+[`docs/godot/paint-mode.md`](docs/godot/paint-mode.md). Ripples:
+[`docs/godot/ripples.md`](docs/godot/ripples.md).
 
 ## Licence
 

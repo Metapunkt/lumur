@@ -35,6 +35,12 @@ Room scan (triangulation, confidence, planes, room package schema):
 Godot paint-the-room mode (addon, surface targets, headless render):
 [godot/paint-mode.md](godot/paint-mode.md).
 
+Tracking / footsteps (pose, subtraction mask, UDP events):
+[companion/tracking.md](companion/tracking.md).
+
+Footstep ripples in Godot:
+[godot/ripples.md](godot/ripples.md).
+
 Further user guides, a developer guide, and implementation contracts will
 appear here as the runtime grows.
 

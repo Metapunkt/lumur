@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "lumur"
 version = "0.1.0"
-description = "Lumur Python companion: structured-light calibration and scan"
+description = "Lumur Python companion: structured-light calibration, scan, and tracking"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
@@ -16,11 +16,14 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=7.4"]
+pose = ["mediapipe>=0.10"]
+yolo = ["ultralytics>=8.0"]
 
 [project.scripts]
 lumur-calibrate = "lumur.cli:main"
 lumur-scan = "lumur.cli_scan:main"
 lumur-export-godot = "lumur.cli_export_godot:main"
+lumur-track = "lumur.cli_track:main"
 
 [tool.setuptools.packages.find]
 include = ["lumur*"]

@@ -76,6 +76,14 @@ func set_time_seconds(t: float) -> void:
 		_material.set_shader_parameter("time_seconds", _time_s)
 
 
+func set_ripple_overlay(tex: Texture2D, floor_surface_id: int = -1) -> void:
+	## Optional RGBA overlay composited on the floor surface (footstep ripples).
+	_ensure_material()
+	_material.set_shader_parameter("ripple_tex", tex)
+	_material.set_shader_parameter("ripple_floor_id", float(floor_surface_id))
+	_material.set_shader_parameter("ripple_enabled", tex != null)
+
+
 func _ensure_material() -> void:
 	if _material != null:
 		material = _material
@@ -90,6 +98,11 @@ func _ensure_material() -> void:
 	_mode_tex = ImageTexture.create_from_image(_mode_image)
 	_material.set_shader_parameter("palette_tex", _palette_tex)
 	_material.set_shader_parameter("mode_tex", _mode_tex)
+	var blank := Image.create(1, 1, false, Image.FORMAT_RGBA8)
+	blank.fill(Color(0, 0, 0, 0))
+	_material.set_shader_parameter("ripple_tex", ImageTexture.create_from_image(blank))
+	_material.set_shader_parameter("ripple_enabled", false)
+	_material.set_shader_parameter("ripple_floor_id", -1.0)
 
 
 func _rebuild_palette() -> void:
