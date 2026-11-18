@@ -1,9 +1,9 @@
 # Lumur
 
-Local-first projection-mapping runtime for Godot that makes rooms come alive
+Projection-mapping runtime for Godot that makes rooms come alive
 with just a webcam and a projector. A spiritual successor to Microsoft's
-RoomAlive: structured-light room scanning, surface-aware apps, interaction
-through people's movement, and optional ComfyUI generation. No Kinect
+RoomAlive providing structured-light room scanning, surface-aware apps, interaction
+through people's movement, and optional ComfyUI driven content generation. No Kinect
 required.
 
 The name joins *lumen* (light) with *mur* (French, from Latin *murus*: wall).
@@ -34,4 +34,4 @@ Source code is MIT. Text, documentation, and other website material are
 
 ## Credits
 
-Designed by **Ayodele Arigbabu**, Metapunkt.
+Built by **Ayodele Arigbabu** with the help of cheerful AI agents for the Metapunkt project.
