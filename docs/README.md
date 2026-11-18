@@ -57,12 +57,14 @@ Opt-in audience steering (PRD-002 slice 4):
 Session / Story Log replay (PRD-002 slice 4):
 [bridge/replay.md](bridge/replay.md).
 
-Application layer (PRD-003; slice 1 = manifest + room fit):
+Application layer (PRD-003; slices 1–2 = manifest + room fit + input
+permissions):
 [PRD-003](product-requirements/PRD-003-LUMUR-OS-APPLICATION-LAYER.md),
 [apps/manifest.md](apps/manifest.md),
+[apps/input.md](apps/input.md),
 [ADR 0017](architectural-decisions/0017-app-manifest-format.md) (Accepted),
 [ADR 0018](architectural-decisions/0018-surface-allocation-and-compositing.md),
-[ADR 0019](architectural-decisions/0019-app-input-permissions.md).
+[ADR 0019](architectural-decisions/0019-app-input-permissions.md) (Accepted).
 
 ## Credit and licence
 

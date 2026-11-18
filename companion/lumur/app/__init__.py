@@ -1,4 +1,4 @@
-"""App-layer helpers: manifests, room services, and surface fit (PRD-003)."""
+"""App-layer helpers: manifests, room services, fit, and input bus (PRD-003)."""
 
 from lumur.app.fit import (
     FitError,
@@ -6,6 +6,11 @@ from lumur.app.fit import (
     SurfaceBinding,
     UnmetSurface,
     fit_app_to_room,
+)
+from lumur.app.input_bus import (
+    AppInputBus,
+    AppInputSession,
+    RefusedSubscription,
 )
 from lumur.app.room_services import RoomServices, SurfaceRecord
 from lumur.schema.app import (
@@ -24,8 +29,11 @@ __all__ = [
     "APP_SCHEMA_VERSION",
     "KNOWN_INPUTS",
     "MANIFEST_FILENAME",
+    "AppInputBus",
+    "AppInputSession",
     "FitError",
     "FitResult",
+    "RefusedSubscription",
     "RoomServices",
     "SurfaceBinding",
     "SurfaceRecord",

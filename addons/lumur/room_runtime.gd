@@ -16,6 +16,7 @@ var package: LumurRoomPackage
 var paint: LumurPaintMode
 var app_manifest: LumurAppManifest
 var last_fit: Dictionary = {}
+var input_bus: LumurAppInputBus
 
 
 func _ready() -> void:
@@ -23,6 +24,11 @@ func _ready() -> void:
 		paint = get_node_or_null(paint_path) as LumurPaintMode
 	if paint == null:
 		paint = get_node_or_null("Paint") as LumurPaintMode
+	input_bus = get_node_or_null("InputBus") as LumurAppInputBus
+	if input_bus == null:
+		input_bus = LumurAppInputBus.new()
+		input_bus.name = "InputBus"
+		add_child(input_bus)
 	if not godot_assets_path.is_empty():
 		load_room(godot_assets_path)
 
@@ -142,11 +148,39 @@ func bound_surface_id(request_key: String) -> int:
 
 
 func bind_event_receiver(receiver: LumurEventReceiver) -> void:
-	## Convenience: apps can subscribe without knowing UDP details.
+	## Wire the raw UDP receiver into the filtered input bus (ADR 0019).
+	## Legacy ``footstep`` signal remains for demos that connect directly;
+	## apps should use ``register_app_inputs`` + ``input_bus``.
 	if receiver == null:
 		return
 	if not receiver.footstep.is_connected(_on_runtime_footstep):
 		receiver.footstep.connect(_on_runtime_footstep)
+	if input_bus != null:
+		input_bus.bind_receiver(receiver)
+
+
+func register_app_inputs(manifest: LumurAppManifest = null, fit_result: Dictionary = {}) -> Dictionary:
+	## Register the current (or given) manifest on the input bus with last/fit bindings.
+	var m := manifest if manifest != null else app_manifest
+	if m == null or input_bus == null:
+		push_error("LumurRoomRuntime: need manifest + input_bus to register inputs")
+		return {}
+	var fit := fit_result if not fit_result.is_empty() else last_fit
+	return input_bus.register_app(m, fit)
+
+
+func subscribe_app_input(app_id: String, event_type: String) -> bool:
+	## Per-app allowlist subscribe; undeclared types are refused and logged.
+	if input_bus == null:
+		return false
+	return input_bus.subscribe(app_id, event_type)
+
+
+func inject_app_event(event: Dictionary) -> Dictionary:
+	## Headless / test injection through the filtered bus.
+	if input_bus == null:
+		return {}
+	return input_bus.inject(event)
 
 
 signal footstep(event: Dictionary)

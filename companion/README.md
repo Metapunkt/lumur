@@ -105,6 +105,16 @@ pytest tests/test_app_manifest_fit.py
 `fit_app_to_room` bind surface *kinds* to a scanned room (no Synesyn).
 See [docs/apps/manifest.md](../docs/apps/manifest.md).
 
+## App input permissions (PRD-003 slice 2)
+
+```bash
+pytest tests/test_app_input_permissions.py
+```
+
+`AppInputBus` filters audience / footstep events per manifest `inputs`
+allowlist (ADR 0019). Undeclared subscriptions are refused and logged.
+See [docs/apps/input.md](../docs/apps/input.md).
+
 ## Audience steering + session replay (slice 4)
 
 Opt-in per scenario (`lumur_audience`). Core emits presence / zone /

@@ -174,13 +174,21 @@ is explicitly out of scope — this PRD is the runtime those boots into.
 - **REQ-003-005:** The runtime must treat companion audience events
   (`presence`, `zone_enter`, `zone_leave`, `gathering`, `footstep`) as room
   input devices on the existing `lumur.event` transport (ADR 0014).
+  **Status (slice 2):** complete-in-sim — `AppInputBus` /
+  `LumurAppInputBus` fan-out over the ADR 0014 vocabulary; fitted floor
+  surface coordinates on positioned deliveries.
 - **REQ-003-006:** An app must receive only event types listed in its
   manifest permissions. Events outside that set must not be delivered to
   the app’s handlers, even if the companion emits them
   ([ADR 0019](../architectural-decisions/0019-app-input-permissions.md)).
+  **Status (slice 2):** complete-in-sim — per-app allowlist; undeclared
+  `subscribe()` refused and logged; host/launcher path separate.
 - **REQ-003-007:** Permission filtering must be enforceable in sim with
   injected events (no hardware). A test app that declares only `footstep`
   must not observe `zone_enter` / `gathering` / `presence`.
+  **Status (slice 2):** complete-in-sim —
+  `companion/tests/test_app_input_permissions.py` (inject + walking
+  figures + replay).
 
 ### Compositor
 
@@ -232,9 +240,9 @@ is explicitly out of scope — this PRD is the runtime those boots into.
   headlessly with the existing sim (`--backend sim` presets), companion
   tests, and/or Godot headless / xvfb. Physical projector/webcam validation
   is deferred. Owner acceptance for this PRD does not depend on hardware.
-  **Status (slice 1):** complete-in-sim for REQs 001–004 —
-  `companion/tests/test_app_manifest_fit.py` on `empty_room`,
-  `room_with_box`, `noisy_room` (no hardware).
+  **Status (slice 1–2):** complete-in-sim for REQs 001–007 —
+  `test_app_manifest_fit.py` + `test_app_input_permissions.py` on sim
+  presets / walking figures (no hardware).
 
 ## Acceptance
 
@@ -250,6 +258,8 @@ Automated (target, as slices land):
   **Done (slice 1)** for single-app fit / room services.
 - Inject audience events; permission filter delivers only declared types
   (REQ-003-005–007).
+  **Done (slice 2):** `test_app_input_permissions.py` +
+  `LumurAppInputBus` / `demo/scripts/headless_app_input.gd`.
 - Two apps sequentially or concurrently on disjoint surfaces; confidence
   mask still drops invalid pixels; switch/pause handoff (REQ-003-008–011).
 - Launcher lists and starts bundled apps headlessly (REQ-003-012, 015).
@@ -328,7 +338,8 @@ keeps Synesyn optional.
   (ADR 0018); input permissions (ADR 0019); existing `lumur.room` /
   `lumur.event` / `SurfaceGenerator`
 - Architectural decision: ADR 0006–0007, 0009, 0012–0019
-- Implementation tracker: slice 1 in progress (manifest + room fit)
+- Implementation tracker: slices 1–2 complete-in-sim (manifest + room fit;
+  input permissions); slices 3–4 remain
 - Executable specification: `companion/tests/test_app_manifest_fit.py`;
   authoring guide [`docs/apps/manifest.md`](../apps/manifest.md)
 - Founding notes: [scratchpad](../scratchpad.md)

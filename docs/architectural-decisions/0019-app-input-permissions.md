@@ -1,6 +1,6 @@
 # 0019 — Per-app input permissions for room events
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-11-18
 - **Area:** runtime / input / apps
 - **Relates to:** ADR 0006, ADR 0014, ADR 0015, ADR 0017; PRD-002, PRD-003
@@ -82,6 +82,6 @@ dwell to switch apps, even while the foreground app only declared
   Honest apps and CI are the bar for v1.
 - Trade-off: host/launcher privileges must stay narrow and documented so
   they do not become a back door for every demo scene.
-- Follow-up: when Accepted, implement filter beside `LumurEventReceiver`
-  (and a Python mirror for companion tests); extend envelopes only via
-  versioned schema when new device kinds appear.
+- Follow-up: done in PRD-003 slice 2 — `AppInputBus` /
+  `LumurAppInputBus` filter beside `LumurEventReceiver`; extend envelopes
+  only via versioned schema when new device kinds appear.
