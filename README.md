@@ -13,16 +13,16 @@ only the interactions that matter, and renders continuously. Experiences are
 apps that target named surfaces, so the same app can be installed in another
 room.
 
-**Status:** pre-code, design phase. The
+**Status:** early implementation. Founding intent lives in the
 [scratchpad](docs/scratchpad.md),
 [architectural decisions](docs/architectural-decisions/README.md) and
-[product requirements](docs/product-requirements/README.md) record the founding
-intent. A public repository is planned at
-[Metapunkt/lumur](https://github.com/Metapunkt/lumur).
+[product requirements](docs/product-requirements/README.md). The first code
+slice is the Python calibration companion under [`companion/`](companion/).
 
 ## Documentation
 
-Start at [`docs/`](docs/README.md).
+Start at [`docs/`](docs/README.md). Calibration runbook and JSON schema:
+[`docs/companion/calibration.md`](docs/companion/calibration.md).
 
 ## Licence
 
