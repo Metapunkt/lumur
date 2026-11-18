@@ -142,6 +142,24 @@ tagline and, later, as an appliance image. *Muros* already means “walls” in
 Spanish and Portuguese, which made MurOS attractive, but Lumur is the more
 confident brand. The planned repository name is `lumur`.
 
+### Why Lumur
+
+Five letters, two syllables (LOO-mur). The name is architecturally
+minimal: it reads as balanced and sculptural in a wordmark, or stamped
+on hardware. The repeated *u* and the *m-u* rhythm give that balance.
+
+The meaning is pure. *Lu-* from *lumen* (light, glow); *-mur* from
+Latin *murus* / French *mur* (wall). No suffix is needed to signal
+technology.
+
+The short core also extends naturally — LumurOS for a software or
+appliance image, Lumur Tile for modular panels, Lumur Studio for
+spatial design tools — without forcing a family name. Those extensions
+are illustrative only; none of them are committed products.
+
+It is pronounceable across languages, which fits a project with roots
+in Trondheim and Lagos.
+
 ## Lumur OS
 
 “OS” is the right architecture if it means an operating system *for rooms*,
