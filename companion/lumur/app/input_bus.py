@@ -53,12 +53,17 @@ class AppInputSession:
     allowed: frozenset[str]
     bindings: dict[str, SurfaceBinding] = field(default_factory=dict)
     is_host: bool = False
+    paused: bool = False
     delivered: list[dict[str, Any]] = field(default_factory=list)
     _handlers: dict[str, list[EventHandler]] = field(default_factory=dict)
     _catch_all: list[EventHandler] = field(default_factory=list)
 
     def allows(self, event_type: str) -> bool:
         return event_type in self.allowed
+
+    def set_paused(self, paused: bool) -> None:
+        """Paused apps keep subscriptions but receive no events (REQ-003-011)."""
+        self.paused = bool(paused)
 
     def subscribe(
         self, event_type: str, handler: EventHandler | None = None
@@ -175,6 +180,14 @@ class AppInputBus:
     def get(self, app_id: str) -> AppInputSession | None:
         return self.apps.get(app_id)
 
+    def set_paused(self, app_id: str, paused: bool) -> bool:
+        """Pause/resume event delivery for an app. Returns False if unknown."""
+        session = self.apps.get(app_id)
+        if session is None:
+            return False
+        session.set_paused(paused)
+        return True
+
     def subscribe(
         self,
         app_id: str,
@@ -234,6 +247,8 @@ class AppInputBus:
 
         delivered: dict[str, list[dict[str, Any]]] = {}
         for app_id, session in self.apps.items():
+            if session.paused and not session.is_host:
+                continue
             if not session.allows(ev_type):
                 continue
             app_event = _fit_event_for_app(envelope, session)

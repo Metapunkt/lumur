@@ -134,6 +134,8 @@ and deterministic binding on `empty_room`, `room_with_box`, and `noisy_room`.
 ## Related
 
 Per-app input allowlist and event bus: [input.md](input.md) (PRD-003 slice 2).
+Compositor ownership / masking: [compositor.md](compositor.md) (slice 3).
+Lifecycle / launcher / zone switch: [lifecycle.md](lifecycle.md) (slice 3).
 
 ## Licence
 

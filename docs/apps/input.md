@@ -52,9 +52,10 @@ injection):
 `unknown_app`.
 
 Multiple launched apps each get an independent filtered view. A privileged
-**host / launcher** path (`register_host`) may listen for `zone_*` for later
-zone→app switching (REQ-003-013) without granting those types to the
-foreground app.
+**host / launcher** path (`register_host`) may listen for `zone_*` for
+zone→app switching (REQ-003-013; [lifecycle.md](lifecycle.md)) without
+granting those types to the foreground app. **Paused** apps keep
+subscriptions but receive no events (REQ-003-011).
 
 Bridge audience steering (`lumur_synesyn`) remains opt-in per scenario
 (REQ-002-011). App input permissions do **not** grant story steering.

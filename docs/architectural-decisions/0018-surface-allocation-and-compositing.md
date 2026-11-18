@@ -1,11 +1,12 @@
 # 0018 — Surface allocation and compositing rules
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-11-18
 - **Area:** runtime / display / apps
 - **Relates to:** ADR 0006, ADR 0012, ADR 0013, ADR 0017, ADR 0019; PRD-003
 - **Refines:** ADR 0006 (display server / multi-app compositing was deferred
-  until real apps needed it — PRD-003 supplies those apps)
+  until real apps needed it — PRD-003 slice 3 implements ownership + cut
+  handoff; see [compositor.md](../apps/compositor.md))
 
 ## Context
 
@@ -103,6 +104,6 @@ Option 3.
   two apps on one wall wait for region insets or a later ADR.
 - Trade-off: authors must mark overlays explicitly — accidental double paint
   on the floor is a config error, not undefined behaviour.
-- Follow-up: when Accepted, implement allocator + ownership table in the
-  Godot runtime (with companion unit tests on pure allocation); refine ADR
-  0006’s “compositor deferred” note by this record rather than editing 0006.
+- Follow-up: region insets / crossfade remain future work; slice 3 shipped
+  whole-surface ownership + cut transitions in `Compositor` /
+  `LumurCompositor` with companion sim tests.

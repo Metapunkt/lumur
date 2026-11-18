@@ -115,6 +115,18 @@ pytest tests/test_app_input_permissions.py
 allowlist (ADR 0019). Undeclared subscriptions are refused and logged.
 See [docs/apps/input.md](../docs/apps/input.md).
 
+## Compositor + lifecycle (PRD-003 slice 3)
+
+```bash
+pytest tests/test_app_compositor_lifecycle.py
+```
+
+`Compositor` owns surface allocation across apps; `AppLifecycle` /
+`Launcher` install–launch–pause–switch; optional `ZoneAppSwitcher` with
+shared `DwellGate`. Paused apps receive no input events. See
+[docs/apps/compositor.md](../docs/apps/compositor.md) and
+[docs/apps/lifecycle.md](../docs/apps/lifecycle.md).
+
 ## Audience steering + session replay (slice 4)
 
 Opt-in per scenario (`lumur_audience`). Core emits presence / zone /

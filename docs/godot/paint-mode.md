@@ -102,7 +102,10 @@ call Python or ComfyUI on its critical path ([ADR 0008](../architectural-decisio
 
 Portable apps should declare surfaces in a `lumur.app` manifest and call
 `LumurRoomRuntime.fit_app` rather than hard-coding roles per room — see
-[apps/manifest.md](../apps/manifest.md).
+[apps/manifest.md](../apps/manifest.md). Multi-app ownership and cut handoff
+on pause/switch use the compositor
+([apps/compositor.md](../apps/compositor.md)); confidence masking here
+remains the single masking authority.
 
 ## How the mapping works
 
@@ -123,7 +126,9 @@ addons/lumur/          Godot 4 addon (MIT)
   room_package.gd      loads godot/ assets
   surface_target.gd    per-surface content handle
   paint_mode.gd(.shader)
-  room_runtime.gd      small room-as-OS facade
+  room_runtime.gd      small room-as-OS facade (+ lifecycle / compositor)
+  compositor.gd        surface ownership (PRD-003 slice 3)
+  app_lifecycle.gd     install / launch / pause / switch
   surface_generator.gd null / package apply (PRD-002)
 demo/
   scenes/paint_demo.tscn

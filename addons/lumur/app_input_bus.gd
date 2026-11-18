@@ -59,6 +59,7 @@ func register_app(manifest: LumurAppManifest, fit_result: Dictionary = {}) -> Di
 		"bindings": bindings,
 		"delivered": [],
 		"is_host": false,
+		"paused": false,
 	}
 	_apps[app_id] = session
 	return session
@@ -85,6 +86,7 @@ func register_host(host_id: String, allowed: PackedStringArray) -> Dictionary:
 		"bindings": {},
 		"delivered": [],
 		"is_host": true,
+		"paused": false,
 	}
 	_apps[host_id] = session
 	return session
@@ -92,6 +94,23 @@ func register_host(host_id: String, allowed: PackedStringArray) -> Dictionary:
 
 func unregister(app_id: String) -> void:
 	_apps.erase(app_id)
+
+
+func has_app(app_id: String) -> bool:
+	return _apps.has(app_id)
+
+
+func set_bindings(app_id: String, bindings: Dictionary) -> void:
+	if _apps.has(app_id):
+		_apps[app_id]["bindings"] = bindings
+
+
+func set_paused(app_id: String, paused: bool) -> bool:
+	## Paused apps keep subscriptions but receive no events (REQ-003-011).
+	if not _apps.has(app_id):
+		return false
+	_apps[app_id]["paused"] = paused
+	return true
 
 
 func subscribe(app_id: String, event_type: String) -> bool:
@@ -126,6 +145,8 @@ func publish(event: Dictionary) -> Dictionary:
 	var delivered := {}
 	for app_id in _apps.keys():
 		var session: Dictionary = _apps[app_id]
+		if bool(session.get("paused", false)) and not bool(session.get("is_host", false)):
+			continue
 		var allowed: PackedStringArray = session.get("allowed", PackedStringArray())
 		if not allowed.has(ev_type):
 			continue
