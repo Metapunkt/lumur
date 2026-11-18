@@ -63,6 +63,16 @@ Optional real pose backends: `pip install -e ".[pose]"` (MediaPipe) or
 [docs/companion/tracking.md](../docs/companion/tracking.md) and
 [docs/godot/ripples.md](../docs/godot/ripples.md).
 
+## Surface generation (standalone ComfyUI)
+
+```bash
+lumur-generate /tmp/sim-room --surface floor --comfy-url http://127.0.0.1:8188
+# → /tmp/sim-room/generated/ + paint_manifest generated_textures
+```
+
+No Synesyn dependency. See
+[docs/companion/comfyui.md](../docs/companion/comfyui.md).
+
 ## Live calibration and scan
 
 See [docs/companion/calibration.md](../docs/companion/calibration.md) and

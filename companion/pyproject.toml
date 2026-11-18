@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "lumur"
 version = "0.1.0"
-description = "Lumur Python companion: structured-light calibration, scan, and tracking"
+description = "Lumur Python companion: structured-light calibration, scan, tracking, and ComfyUI generation"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
@@ -24,12 +24,13 @@ lumur-calibrate = "lumur.cli:main"
 lumur-scan = "lumur.cli_scan:main"
 lumur-export-godot = "lumur.cli_export_godot:main"
 lumur-track = "lumur.cli_track:main"
+lumur-generate = "lumur.cli_generate:main"
 
 [tool.setuptools.packages.find]
 include = ["lumur*"]
 
 [tool.setuptools.package-data]
-lumur = ["sim/presets/*.json"]
+lumur = ["sim/presets/*.json", "presets/workflows/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

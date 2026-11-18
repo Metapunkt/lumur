@@ -1,0 +1,55 @@
+{
+  "schema": "lumur.workflow_preset",
+  "schema_version": "1.0",
+  "id": "surface_floor_controls",
+  "display_name": "Floor with mask control (dev)",
+  "metadata": {
+    "preset": {
+      "tags": [
+        "lumur:surface_role=floor"
+      ]
+    }
+  },
+  "controls": {
+    "mask": true,
+    "depth": true,
+    "normal": false
+  },
+  "control_nodes": {
+    "mask": {
+      "node_id": "10",
+      "input": "image"
+    }
+  },
+  "size_patches": [
+    {
+      "node_id": "1",
+      "width_input": "width",
+      "height_input": "height"
+    }
+  ],
+  "workflow": {
+    "10": {
+      "class_type": "LoadImage",
+      "inputs": {
+        "image": "mask.png"
+      }
+    },
+    "1": {
+      "class_type": "EmptyImage",
+      "inputs": {
+        "width": 512,
+        "height": 512,
+        "batch_size": 1,
+        "color": 0
+      }
+    },
+    "2": {
+      "class_type": "SaveImage",
+      "inputs": {
+        "filename_prefix": "lumur_floor",
+        "images": ["1", 0]
+      }
+    }
+  }
+}

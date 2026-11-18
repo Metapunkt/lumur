@@ -43,8 +43,11 @@ Tracking / footsteps (pose, subtraction mask, UDP events):
 Footstep ripples in Godot:
 [godot/ripples.md](godot/ripples.md).
 
-Next product intent (generation providers, optional Synesyn bridge, Story
-Stage on surfaces):
+Standalone ComfyUI surface generation (no Synesyn):
+[companion/comfyui.md](companion/comfyui.md).
+
+Next product intent (optional Synesyn bridge, Story Stage on surfaces —
+PRD-002 slices 2+):
 [PRD-002](product-requirements/PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md),
 [ADR 0015](architectural-decisions/0015-single-lumur-synesyn-bridge.md),
 [ADR 0016](architectural-decisions/0016-pluggable-surface-generators.md).

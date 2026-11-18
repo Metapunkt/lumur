@@ -14,6 +14,8 @@ var _palette_image: Image
 var _mode_image: Image
 var _palette_tex: ImageTexture
 var _mode_tex: ImageTexture
+var _surface_tex_array: Texture2DArray
+var _texture_layer_size: Vector2i = Vector2i(64, 64)
 var _time_s: float = 0.0
 
 
@@ -70,6 +72,48 @@ func set_surface_pulse(key: Variant, color: Color, hz: float = 1.0) -> void:
 		t.set_pulse(color, hz)
 
 
+func set_surface_texture(key: Variant, tex: Texture2D, tint: Color = Color.WHITE) -> void:
+	var t := get_target(key)
+	if t != null:
+		t.set_texture(tex, tint)
+
+
+func apply_generated_from_package() -> int:
+	## Load ``generated_textures`` entries from the paint manifest (companion
+	## ``lumur-generate``). Returns how many surfaces were textured.
+	if _package == null:
+		return 0
+	var applied := 0
+	var generated: Dictionary = _package.manifest.get("generated_textures", {})
+	var assets_dir := _package.assets_dir
+	for key in generated.keys():
+		var entry: Variant = generated[key]
+		var rel := ""
+		if typeof(entry) == TYPE_DICTIONARY:
+			rel = str(entry.get("path", ""))
+		else:
+			rel = str(entry)
+		if rel.is_empty():
+			continue
+		var path := assets_dir.path_join(rel)
+		if not FileAccess.file_exists(path):
+			# Paths are relative to godot/; also try package-relative.
+			var alt := assets_dir.get_base_dir().path_join(rel.trim_prefix("../"))
+			if FileAccess.file_exists(alt):
+				path = alt
+			else:
+				continue
+		var img := Image.load_from_file(path)
+		if img == null or img.is_empty():
+			continue
+		var tex := ImageTexture.create_from_image(img)
+		var t := get_target(key)
+		if t != null:
+			t.set_texture(tex)
+			applied += 1
+	return applied
+
+
 func set_time_seconds(t: float) -> void:
 	_time_s = t
 	if _material != null:
@@ -103,13 +147,36 @@ func _ensure_material() -> void:
 	_material.set_shader_parameter("ripple_tex", ImageTexture.create_from_image(blank))
 	_material.set_shader_parameter("ripple_enabled", false)
 	_material.set_shader_parameter("ripple_floor_id", -1.0)
+	_material.set_shader_parameter("textures_enabled", false)
+	_ensure_texture_array()
+
+
+func _ensure_texture_array() -> void:
+	if _surface_tex_array != null:
+		return
+	var images: Array[Image] = []
+	var blank := Image.create(_texture_layer_size.x, _texture_layer_size.y, false, Image.FORMAT_RGBA8)
+	blank.fill(Color(0, 0, 0, 1))
+	for _i in range(256):
+		images.append(blank.duplicate())
+	_surface_tex_array = Texture2DArray.new()
+	_surface_tex_array.create_from_images(images)
+	if _material != null:
+		_material.set_shader_parameter("surface_textures", _surface_tex_array)
 
 
 func _rebuild_palette() -> void:
 	if _palette_image == null:
 		_ensure_material()
+	_ensure_texture_array()
 	_palette_image.fill(Color(0, 0, 0, 1))
 	_mode_image.fill(Color(0, 0, 0, 1))
+	var any_texture := false
+	var layers: Array[Image] = []
+	var blank := Image.create(_texture_layer_size.x, _texture_layer_size.y, false, Image.FORMAT_RGBA8)
+	blank.fill(Color(0, 0, 0, 1))
+	for _i in range(256):
+		layers.append(blank.duplicate())
 	for sid in _targets.keys():
 		var t: LumurSurfaceTarget = _targets[sid]
 		var x := int(sid)
@@ -119,10 +186,22 @@ func _rebuild_palette() -> void:
 		var mode_v := 0.0
 		if t.mode == LumurSurfaceTarget.MODE_TEXTURE:
 			mode_v = 1.0 / 255.0
+			any_texture = true
+			if t.texture != null:
+				var src := t.texture.get_image()
+				if src != null and not src.is_empty():
+					var layer := src.duplicate()
+					if layer.get_format() != Image.FORMAT_RGBA8:
+						layer.convert(Image.FORMAT_RGBA8)
+					layer.resize(_texture_layer_size.x, _texture_layer_size.y, Image.INTERPOLATE_BILINEAR)
+					layers[x] = layer
 		elif t.mode == LumurSurfaceTarget.MODE_PULSE:
 			mode_v = 2.0 / 255.0
 		_mode_image.set_pixel(x, 0, Color(mode_v, 0, 0))
 	_palette_tex.update(_palette_image)
 	_mode_tex.update(_mode_image)
+	_surface_tex_array.create_from_images(layers)
+	_material.set_shader_parameter("surface_textures", _surface_tex_array)
+	_material.set_shader_parameter("textures_enabled", any_texture)
 	_material.set_shader_parameter("confidence_threshold", confidence_threshold)
 	_material.set_shader_parameter("clear_color", clear_color)

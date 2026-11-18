@@ -1,9 +1,14 @@
 # 0015 — Single `lumur_synesyn` bridge for Synesyn integration (render + Story Stage)
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-11-18
 - **Area:** integration / boundaries
 - **Relates to:** ADR 0006, ADR 0008, ADR 0009, ADR 0016; PRD-002
+
+Accepted after owner merge of
+[PR #8](https://github.com/Metapunkt/lumur/pull/8) (docs: PRD-002 + ADRs
+0015–0016). Slice 1 implements standalone generation without this bridge;
+`lumur_synesyn` remains future work (PRD-002 slices 2+).
 
 ## Context
 

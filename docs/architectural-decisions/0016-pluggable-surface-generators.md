@@ -1,11 +1,17 @@
 # 0016 — Pluggable surface generators; ComfyUI with or without Synesyn
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-11-18
 - **Area:** content / generation
 - **Relates to:** ADR 0004, ADR 0006, ADR 0008, ADR 0009, ADR 0015; PRD-002
 - **Refines:** ADR 0008 (async / optional / off the render path remains binding;
   the attachment shape is replaced below)
+
+Accepted after owner merge of
+[PR #8](https://github.com/Metapunkt/lumur/pull/8). Slice 1 lands the
+generator interface, null provider, and standalone ComfyUI provider in the
+Python companion (Godot consumes results via paint mode); Hub provider stays
+in `lumur_synesyn` (slice 2).
 
 ## Context
 

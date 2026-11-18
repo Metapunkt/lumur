@@ -2,7 +2,7 @@
 id: PRD-002
 title: Surface generation, Synesyn bridge, and Story Stage on Lumur
 status: draft
-version: "0.1"
+version: "0.2"
 owner: Ayodele Arigbabu
 last_reviewed: 2026-11-18
 primary_users: [installer, author, visitor, workshop facilitator]
@@ -174,23 +174,35 @@ tab, Story Catalyst, Story Stage). This PRD does not duplicate them.
   control images (mask, depth, normal), and a preset reference, and that
   delivers textures asynchronously to paint mode. The projector render
   path must not await generation.
+  **Status (slice 1):** complete-in-sim — `lumur.generate` +
+  `LumurSurfaceGenerator` (Godot); `JobRunner` keeps work off the render
+  path; paint loads finished textures from the room package.
 - **REQ-002-002:** Lumur must ship a first-class **standalone ComfyUI
   provider** implementing that interface via the direct ComfyUI API, with
   Lumur-owned workflow presets. Core and this provider must not depend on
   Synesyn packages, Hub URLs, or `synesyn_core`.
+  **Status (slice 1):** complete-in-sim — `ComfyUISurfaceGenerator` +
+  `lumur-generate` CLI; verified against an in-process ComfyUI mock; no
+  Synesyn imports in core.
 - **REQ-002-003:** Standalone requests must be surface-aware: they carry
   the target surface’s pixel size and aspect, and may attach mask, depth,
   and/or normal control images derived from the room package when the
   preset expects them.
+  **Status (slice 1):** complete-in-sim — `lumur.surface_render_request`
+  + control image derivation from the room package.
 - **REQ-002-004:** Standalone preset metadata must use a tag shape
   aligned with Synesyn’s where sensible — at minimum
   `lumur:surface_role=<role>`, with optional scoping tags — so authors
   can move presets between Lumur-local storage and SynPunkt without
   rewriting role semantics.
+  **Status (slice 1):** complete-in-sim — `lumur.workflow_preset` with
+  `metadata.preset.tags` and most-specific selection fallback.
 - **REQ-002-005:** If no generator provider is configured, or generation
   fails / times out / disconnects, paint mode and the projector must
   continue with the last good or authored surface content
   (graceful degradation; ADR 0008 / ADR 0016).
+  **Status (slice 1):** complete-in-sim — null provider; failure/timeout
+  leave `generated_textures` unchanged.
 
 ### Optional Synesyn Hub provider (`lumur_synesyn`)
 
@@ -264,6 +276,9 @@ tab, Story Catalyst, Story Stage). This PRD does not duplicate them.
   xvfb), using a ComfyUI stub for standalone generation and a Synesyn Hub
   mock for bridge behaviour. Physical hardware validation is explicitly
   deferred.
+  **Status (slice 1):** complete-in-sim for REQs 001–005 —
+  `companion/tests/test_generate_comfyui.py` + mock ComfyUI server; Hub
+  mock deferred to slice 2.
 
 ## Acceptance
 
@@ -367,11 +382,12 @@ Synesyn code change is required**; Lumur adapts at the bridge boundary.
   [tracking.md](../companion/tracking.md),
   [ripples.md](../godot/ripples.md); Synesyn SynPunkt / Story Stage /
   Story Catalyst guides (upstream)
-- Normative contract: generator interface + preset tag conventions (to be
-  written with implementation); `lumur.event` extensions for presence /
-  zones; `SynesynRenderRequestV1` (upstream)
+- Normative contract: [comfyui.md](../companion/comfyui.md) (slice 1
+  generator / presets); `lumur.event` extensions for presence / zones
+  (later slices); `SynesynRenderRequestV1` (upstream, slice 2+)
 - Architectural decision: ADR 0008, 0009, 0015, 0016
-- Implementation tracker: none yet
-- Executable specification: to be added per slice under `companion/tests/`
-  and Godot headless scripts
+- Implementation tracker: slice 1 in companion `lumur.generate` +
+  `addons/lumur` paint texture path
+- Executable specification: `companion/tests/test_generate_comfyui.py`
+  (slice 1); further Godot headless / Hub mock tests per later slices
 - Founding notes: [scratchpad](../scratchpad.md)

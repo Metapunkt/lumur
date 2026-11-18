@@ -5,6 +5,7 @@ extends RefCounted
 ## (``paint_manifest.json`` + PNG lookups). Does not read ``.npz``.
 
 var manifest: Dictionary = {}
+var assets_dir: String = ""
 var surface_id_texture: ImageTexture
 var confidence_texture: ImageTexture
 var lookup_texture: ImageTexture
@@ -13,6 +14,7 @@ var _surfaces_by_id: Dictionary = {}
 
 
 func load_godot_dir(path: String) -> Error:
+	assets_dir = path
 	var manifest_path := path.path_join("paint_manifest.json")
 	if not FileAccess.file_exists(manifest_path):
 		push_error("LumurRoomPackage: missing %s" % manifest_path)

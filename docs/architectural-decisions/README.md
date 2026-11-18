@@ -25,5 +25,5 @@ moved path, but the decision itself stands until a successor replaces it.
 | [0012](0012-versioned-room-package.md) | Versioned room package for scan output | Accepted | 2026-11-18 |
 | [0013](0013-godot-paint-asset-export.md) | Godot paint assets exported as PNG + JSON | Accepted | 2026-11-18 |
 | [0014](0014-udp-json-event-transport.md) | Local UDP JSON for companion → Godot events | Accepted | 2026-11-18 |
-| [0015](0015-single-lumur-synesyn-bridge.md) | Single `lumur_synesyn` bridge for Synesyn integration (render + Story Stage) | Proposed | 2026-11-18 |
-| [0016](0016-pluggable-surface-generators.md) | Pluggable surface generators; ComfyUI with or without Synesyn | Proposed | 2026-11-18 |
+| [0015](0015-single-lumur-synesyn-bridge.md) | Single `lumur_synesyn` bridge for Synesyn integration (render + Story Stage) | Accepted | 2026-11-18 |
+| [0016](0016-pluggable-surface-generators.md) | Pluggable surface generators; ComfyUI with or without Synesyn | Accepted | 2026-11-18 |
