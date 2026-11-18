@@ -7,10 +7,10 @@ Pick the documentation pathway that best describes your needs.
 - [Scratchpad](scratchpad.md) — the founding brainstorm, dated 2026-11-18,
   including the naming journey and open questions.
 - [Product requirements](product-requirements/README.md) — what each
-  milestone must do, and how success is measured ([PRD-001](product-requirements/PRD-001-CALIBRATE-PAINT-RIPPLE.md)
-  and [PRD-002](product-requirements/PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md)
-  complete-in-sim; [PRD-003](product-requirements/PRD-003-LUMUR-OS-APPLICATION-LAYER.md)
-  draft: application layer).
+  milestone must do, and how success is measured ([PRD-001](product-requirements/PRD-001-CALIBRATE-PAINT-RIPPLE.md),
+  [PRD-002](product-requirements/PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md),
+  and [PRD-003](product-requirements/PRD-003-LUMUR-OS-APPLICATION-LAYER.md)
+  complete-in-sim).
 - [Architectural decisions](architectural-decisions/README.md) — why it is
   built this way. Append-only, including the decisions we reverse.
 
@@ -57,13 +57,14 @@ Opt-in audience steering (PRD-002 slice 4):
 Session / Story Log replay (PRD-002 slice 4):
 [bridge/replay.md](bridge/replay.md).
 
-Application layer (PRD-003; slices 1–3 = manifest + fit + input permissions
-+ compositor + lifecycle/launcher):
+Application layer (PRD-003 complete-in-sim: manifest + fit + input
+permissions + compositor + lifecycle + bundled apps + generation):
 [PRD-003](product-requirements/PRD-003-LUMUR-OS-APPLICATION-LAYER.md),
 [apps/manifest.md](apps/manifest.md),
 [apps/input.md](apps/input.md),
 [apps/compositor.md](apps/compositor.md),
 [apps/lifecycle.md](apps/lifecycle.md),
+[apps/generation.md](apps/generation.md),
 [ADR 0017](architectural-decisions/0017-app-manifest-format.md) (Accepted),
 [ADR 0018](architectural-decisions/0018-surface-allocation-and-compositing.md) (Accepted),
 [ADR 0019](architectural-decisions/0019-app-input-permissions.md) (Accepted).

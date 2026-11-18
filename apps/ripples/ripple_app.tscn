@@ -1,0 +1,31 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://apps/ripples/ripple_app.gd" id="1_boot"]
+[ext_resource type="Script" path="res://addons/lumur/room_runtime.gd" id="2_runtime"]
+[ext_resource type="Script" path="res://addons/lumur/paint_mode.gd" id="3_paint"]
+[ext_resource type="Script" path="res://addons/lumur/event_receiver.gd" id="4_events"]
+[ext_resource type="Script" path="res://addons/lumur/ripple_layer.gd" id="5_ripple"]
+
+[node name="RippleApp" type="Node"]
+script = ExtResource("1_boot")
+
+[node name="Runtime" type="Node" parent="."]
+script = ExtResource("2_runtime")
+paint_path = NodePath("Paint")
+
+[node name="Paint" type="ColorRect" parent="Runtime"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_paint")
+
+[node name="EventReceiver" type="Node" parent="Runtime"]
+script = ExtResource("4_events")
+bind_port = 8765
+
+[node name="Ripples" type="Node" parent="Runtime"]
+script = ExtResource("5_ripple")
+paint_path = NodePath("../Paint")
+runtime_path = NodePath("..")

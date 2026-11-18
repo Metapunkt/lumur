@@ -75,18 +75,18 @@ func launch(app_id: String, make_foreground: bool = true) -> Dictionary:
 		return resume(app_id, make_foreground)
 
 	var manifest: LumurAppManifest = record["manifest"]
+	var shares := PackedStringArray()
+	for s in manifest.document.get("shares", []):
+		shares.append(str(s))
 	var fitter := LumurAppFit.new()
 	var owned: Array = compositor.exclusive_owned_ids()
-	var fit: Dictionary = fitter.fit(manifest, package, owned)
+	var fit: Dictionary = fitter.fit(manifest, package, owned, shares)
 	if not bool(fit.get("ok", false)):
 		record["last_error"] = fitter.last_error
 		last_error = fitter.last_error
 		_log("launch_failed", app_id, {"reason": "unmet_surface"})
 		return {}
 
-	var shares := PackedStringArray()
-	for s in manifest.document.get("shares", []):
-		shares.append(str(s))
 	var claims: Array = compositor.claim_from_fit(app_id, fit, shares, false)
 	# claim_from_fit returns [] on exclusive conflict for base.
 	if claims.is_empty():
@@ -151,15 +151,15 @@ func resume(app_id: String, make_foreground: bool = true) -> Dictionary:
 		return launch(app_id, make_foreground)
 
 	var manifest: LumurAppManifest = record["manifest"]
-	var fitter := LumurAppFit.new()
-	var owned: Array = compositor.exclusive_owned_ids()
-	var fit: Dictionary = fitter.fit(manifest, package, owned)
-	if not bool(fit.get("ok", false)):
-		last_error = fitter.last_error
-		return {}
 	var shares := PackedStringArray()
 	for s in manifest.document.get("shares", []):
 		shares.append(str(s))
+	var fitter := LumurAppFit.new()
+	var owned: Array = compositor.exclusive_owned_ids()
+	var fit: Dictionary = fitter.fit(manifest, package, owned, shares)
+	if not bool(fit.get("ok", false)):
+		last_error = fitter.last_error
+		return {}
 	compositor.claim_from_fit(app_id, fit, shares, false)
 	record["fit"] = fit
 	record["state"] = STATE_RUNNING

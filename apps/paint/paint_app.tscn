@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://addons/lumur/room_runtime.gd" id="1_runtime"]
+[ext_resource type="Script" path="res://addons/lumur/paint_mode.gd" id="2_paint"]
+[ext_resource type="Script" path="res://apps/paint/paint_app.gd" id="3_boot"]
+
+[node name="PaintApp" type="Node"]
+script = ExtResource("1_runtime")
+paint_path = NodePath("Paint")
+
+[node name="Boot" type="Node" parent="."]
+script = ExtResource("3_boot")
+
+[node name="Paint" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+script = ExtResource("2_paint")

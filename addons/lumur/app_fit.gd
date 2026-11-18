@@ -9,14 +9,23 @@ var last_error: String = ""
 var last_unmet: Array = []
 
 
-func fit(manifest: LumurAppManifest, package: LumurRoomPackage, exclusive_owned: Array = []) -> Dictionary:
+func fit(
+	manifest: LumurAppManifest,
+	package: LumurRoomPackage,
+	exclusive_owned: Array = [],
+	share_keys: PackedStringArray = PackedStringArray()
+) -> Dictionary:
 	## Returns ``{ok, app_id, bindings, unmet}``. On required failure ``ok`` is
 	## false and ``last_error`` is set; bindings collected so far are included.
+	## ``share_keys`` (manifest shares) may bind surfaces already base-owned.
 	last_error = ""
 	last_unmet = []
 	var owned := {}
 	for oid in exclusive_owned:
 		owned[int(oid)] = true
+	var shares := {}
+	for sk in share_keys:
+		shares[str(sk)] = true
 	var used := {}
 	var bindings := {}
 	var unmet: Array = []
@@ -36,12 +45,15 @@ func fit(manifest: LumurAppManifest, package: LumurRoomPackage, exclusive_owned:
 			"count": count,
 			"required": required,
 		}
+		var skip_owned := not shares.has(key)
 		var assigned: Array = []
 		for _i in range(count):
 			var candidates: Array = []
 			for s in surfaces:
 				var sid := int(s.get("id", -1))
-				if used.has(sid) or owned.has(sid):
+				if used.has(sid):
+					continue
+				if skip_owned and owned.has(sid):
 					continue
 				if not _role_matches(s, role):
 					continue

@@ -51,8 +51,8 @@ class Launcher:
         """Installed apps the launcher may start (core by default).
 
         Apps with a non-null manifest ``bridge`` field are omitted unless
-        ``require_bridge`` is True — keeps bridge-hosted apps optional
-        (REQ-003-016 posture for slice 3 listing; full packaging is slice 4).
+        ``require_bridge`` is True — keeps bridge-hosted apps (Story Stage)
+        optional (REQ-003-016).
         """
         out: list[dict[str, Any]] = []
         for rec in self.lifecycle.apps.values():
@@ -62,19 +62,40 @@ class Launcher:
             out.append(rec.to_dict())
         return out
 
-    def start(self, app_id: str) -> AppRecord:
-        """Start one app (launch or switch-to-foreground)."""
+    def start(self, app_id: str, *, concurrent_overlay: bool | None = None) -> AppRecord:
+        """Start one app (launch or switch-to-foreground).
+
+        Pure overlay apps (every surface key listed in ``shares``) launch
+        concurrently without pausing the foreground base owner — e.g. ripples
+        over paint (ADR 0018). Pass ``concurrent_overlay=True/False`` to force.
+        """
         if app_id not in self.lifecycle.apps:
             raise LifecycleError(f"unknown app {app_id!r}", reason="unknown_app")
+        record = self.lifecycle.apps[app_id]
+        if concurrent_overlay is None:
+            concurrent_overlay = self._is_pure_overlay(record.manifest)
+        if concurrent_overlay:
+            if record.state == AppState.PAUSED:
+                return self.lifecycle.resume(app_id, make_foreground=False)
+            if record.state == AppState.RUNNING:
+                return record
+            return self.lifecycle.launch(app_id, make_foreground=False)
         if self.lifecycle.foreground_app_id and self.lifecycle.foreground_app_id != app_id:
             return self.lifecycle.switch(app_id)
-        record = self.lifecycle.apps[app_id]
         if record.state == AppState.PAUSED:
             return self.lifecycle.resume(app_id)
         if record.state == AppState.RUNNING:
             self.lifecycle.foreground_app_id = app_id
             return record
         return self.lifecycle.launch(app_id)
+
+    @staticmethod
+    def _is_pure_overlay(manifest: dict[str, Any]) -> bool:
+        shares = {str(s) for s in (manifest.get("shares") or [])}
+        if not shares:
+            return False
+        keys = {str(s.get("key")) for s in (manifest.get("surfaces") or [])}
+        return bool(keys) and keys <= shares
 
     def stop(self, app_id: str) -> AppRecord:
         return self.lifecycle.stop(app_id)

@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://addons/lumur_synesyn/apps/story_stage/story_stage_app.gd" id="1_boot"]
+[ext_resource type="Script" path="res://addons/lumur/room_runtime.gd" id="2_runtime"]
+[ext_resource type="Script" path="res://addons/lumur/paint_mode.gd" id="3_paint"]
+[ext_resource type="Script" path="res://addons/lumur_synesyn/story_stage_projector.gd" id="4_proj"]
+
+[node name="StoryStageApp" type="Node"]
+script = ExtResource("1_boot")
+
+[node name="Runtime" type="Node" parent="."]
+script = ExtResource("2_runtime")
+paint_path = NodePath("Paint")
+
+[node name="Paint" type="ColorRect" parent="Runtime"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_paint")
+
+[node name="StoryStageProjector" type="Node" parent="."]
+script = ExtResource("4_proj")
+runtime_path = NodePath("../Runtime")
+paint_path = NodePath("../Runtime/Paint")

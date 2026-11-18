@@ -82,6 +82,7 @@ def fit_app_to_room(
     room: RoomServices,
     *,
     exclusive_owned: set[int] | None = None,
+    share_keys: set[str] | frozenset[str] | None = None,
     raise_on_unmet: bool = True,
 ) -> FitResult:
     """Allocate distinct room surfaces for each manifest request (manifest order).
@@ -94,9 +95,12 @@ def fit_app_to_room(
     - prefer larger ``width_m``, then lower ``surface_id``
     - ``required: true`` (default) with no candidate → hard fail
     - ``required: false`` → bind ``surface_id=None``
+    - keys listed in ``share_keys`` (manifest ``shares``) may bind surfaces
+      already exclusively owned — compositor claims them as overlays
     """
     validate_app_manifest(manifest)
     owned = set(exclusive_owned or ())
+    shares = frozenset(str(k) for k in (share_keys or ()))
     used: set[int] = set()
     bindings: dict[str, SurfaceBinding] = {}
     unmet: list[UnmetSurface] = []
@@ -120,6 +124,8 @@ def fit_app_to_room(
             "count": count,
             "required": required,
         }
+        # Overlay-declared keys may reuse a base-owned surface (ADR 0018 shares).
+        skip_owned = key not in shares
 
         assigned: list[SurfaceRecord] = []
         for _ in range(count):
@@ -127,7 +133,7 @@ def fit_app_to_room(
                 s
                 for s in room.surfaces
                 if s.surface_id not in used
-                and s.surface_id not in owned
+                and (not skip_owned or s.surface_id not in owned)
                 and _role_matches(s, role)
                 and _passes_constraints(s, min_width=min_width, min_conf=min_conf)
             ]

@@ -149,17 +149,12 @@ def test_overlay_share_does_not_steal_base(tmp_path: Path):
     floor_id = room.floor_plane_id
     assert floor_id is not None
 
-    # Overlay fit must see the owned floor: launch with as_overlay bypasses
-    # exclusive exclusion by fitting without owned filter then claiming overlay.
-    # Use compositor directly after a fit that ignores exclusive ownership.
-    fit = fit_app_to_room(overlay, room, exclusive_owned=set())
-    claims = life.compositor.claim_from_fit(
-        "test.ripples", fit, shares=["floor"], as_overlay=True
-    )
-    assert claims and claims[0].layer == "overlay"
+    # share_keys let fit bind an owned floor; claim becomes overlay (ADR 0018).
+    life.launch("test.ripples", make_foreground=False)
     entry = life.compositor.ownership[floor_id]
     assert entry.base_app_id == "test.paint"
     assert ("test.ripples", "floor") in entry.overlays
+    assert life.apps["test.ripples"].state == AppState.RUNNING
 
 
 def test_masking_output_digest_stable(tmp_path: Path):

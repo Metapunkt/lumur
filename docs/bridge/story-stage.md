@@ -6,6 +6,10 @@ all Story Stage code lives in the optional `lumur_synesyn` bridge
 ([ADR 0009](../architectural-decisions/0009-standalone-with-synesyn-bridge.md),
 [ADR 0015](../architectural-decisions/0015-single-lumur-synesyn-bridge.md)).
 
+PRD-003 slice 4 packages Story Stage as a `lumur.app` under
+`addons/lumur_synesyn/apps/story_stage/` (`"bridge": "lumur_synesyn"`). The
+core launcher omits it from `list_startable` unless `require_bridge` is set.
+
 Hub generation (slice 2): [synesyn.md](synesyn.md). Audience steering:
 [audience-steering.md](audience-steering.md). Story Log / session replay:
 [replay.md](replay.md).

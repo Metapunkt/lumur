@@ -27,6 +27,13 @@ func exclusive_owned_ids() -> Array:
 	return out
 
 
+func app_controls_surface(app_id: String, surface_id: int) -> bool:
+	## True when the app owns base or overlays this surface (generation gate).
+	if not claims_by_app.has(app_id):
+		return false
+	return (claims_by_app[app_id] as Dictionary).has(surface_id)
+
+
 func ownership_table() -> Dictionary:
 	var out := {}
 	for sid in ownership.keys():
@@ -54,7 +61,11 @@ func claim_from_fit(
 		var sid = binding.get("surface_id", null)
 		if sid == null:
 			continue
-		var want_overlay := as_overlay or shares.has(str(key))
+		var entry: Dictionary = ownership.get(int(sid), {})
+		var base_owner = entry.get("base_app_id", null)
+		var other_base := base_owner != null and str(base_owner) != app_id
+		# shares = willing to overlay; alone, still take base ownership.
+		var want_overlay := as_overlay or (shares.has(str(key)) and other_base)
 		var claim: Dictionary
 		if want_overlay:
 			claim = _claim_overlay(app_id, int(sid), str(key))

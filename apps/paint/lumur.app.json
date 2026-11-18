@@ -1,0 +1,26 @@
+{
+  "schema": "lumur.app",
+  "schema_version": "1.0",
+  "id": "lumur.paint",
+  "name": "Paint the room",
+  "version": "1.0.0",
+  "scene": "res://apps/paint/paint_app.tscn",
+  "surfaces": [
+    {
+      "key": "floor",
+      "role": "floor",
+      "min_confidence": 0.15,
+      "required": true
+    },
+    {
+      "key": "wall",
+      "role": "wall",
+      "min_width_m": 0.5,
+      "min_confidence": 0.1,
+      "required": false
+    }
+  ],
+  "inputs": [],
+  "generation": true,
+  "bridge": null
+}

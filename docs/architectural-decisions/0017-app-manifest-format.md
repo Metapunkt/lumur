@@ -110,4 +110,5 @@ Allocation and conflict rules live in
   queries from ADR 0006 wait until an app needs them.
 - Follow-up done (slice 1): companion validator (`lumur.schema.app`) and
   Godot loader (`LumurAppManifest`); room-fit in `lumur.app.fit` /
-  `LumurAppFit`. Compositor ownership remains ADR 0018 / later slices.
+  `LumurAppFit`. Slice 4 ships bundled `apps/paint`, `apps/ripples`, and
+  bridge-only Story Stage under `addons/lumur_synesyn/apps/`.

@@ -1,8 +1,8 @@
 ---
 id: PRD-003
 title: Lumur OS application layer
-status: draft
-version: "0.3"
+status: complete-in-sim
+version: "0.4"
 owner: Ayodele Arigbabu
 last_reviewed: 2026-11-18
 primary_users: [author, installer, visitor, workshop facilitator]
@@ -236,15 +236,22 @@ is explicitly out of scope — this PRD is the runtime those boots into.
   asynchronous; missing / failing providers leave last-good or authored
   content. Core and bundled non-bridge apps must not import Synesyn types
   or Hub URLs.
+  **Status (slice 4):** complete-in-sim — `AppGenerationService` /
+  `LumurAppGeneration`; ownership gate; null / mocked ComfyUI / mocked Hub.
 
 ### Bundled apps
 
 - **REQ-003-015:** Footstep ripples and paint-the-room must ship as bundled
   apps under the `lumur.app` manifest format, proving surface requests and
   (for ripples) `footstep` input permission.
+  **Status (slice 4):** complete-in-sim — `apps/ripples`, `apps/paint`
+  with scenes + manifests; ripples overlay via `shares`.
 - **REQ-003-016:** Story Stage must be packageable as a Lumur app only via
   the optional `lumur_synesyn` bridge. Without the bridge, the launcher
   must not require Story Stage; core remains fully useful.
+  **Status (slice 4):** complete-in-sim —
+  `addons/lumur_synesyn/apps/story_stage`; omitted from `list_startable`
+  unless `require_bridge`.
 
 ### Verification
 
@@ -252,9 +259,10 @@ is explicitly out of scope — this PRD is the runtime those boots into.
   headlessly with the existing sim (`--backend sim` presets), companion
   tests, and/or Godot headless / xvfb. Physical projector/webcam validation
   is deferred. Owner acceptance for this PRD does not depend on hardware.
-  **Status (slice 1–3):** complete-in-sim for REQs 001–013 —
+  **Status (slice 1–4):** complete-in-sim for REQs 001–017 —
   `test_app_manifest_fit.py` + `test_app_input_permissions.py` +
-  `test_app_compositor_lifecycle.py` on sim presets (no hardware).
+  `test_app_compositor_lifecycle.py` + `test_app_bundled_generation.py`
+  on sim presets / mocks (no hardware).
 
 ## Acceptance
 
@@ -277,16 +285,21 @@ Automated (target, as slices land):
   **Done (slice 3):** `test_app_compositor_lifecycle.py` (contention,
   masking digest, pause silence, cut handoff).
 - Launcher lists and starts bundled apps headlessly (REQ-003-012, 015).
-  **Done (slice 3)** for discover/list/start of example manifests
-  (REQ-003-015 full bundled scenes → slice 4).
+  **Done (slice 3–4):** example manifests + `apps/ripples` / `apps/paint`
+  scenes; overlay start without pausing paint.
 - Zone→app switch with dwell when configured; no switch when not
   (REQ-003-013).
   **Done (slice 3):** dwell / debounce; passers-by rejected; absent config
   is a no-op.
 - App generation request with null / ComfyUI stub provider; no Synesyn
   imports under `addons/lumur/**` (REQ-003-014, 016).
+  **Done (slice 4):** `test_app_bundled_generation.py` (null, MockComfyUI,
+  MockHub; ownership deny; import boundary).
 - Story Stage app entry appears only with bridge enabled (REQ-003-016).
+  **Done (slice 4):** bridge package under `addons/lumur_synesyn/apps/`;
+  `require_bridge` gate.
 - No live hardware required (REQ-003-017).
+  **Done (slices 1–4).**
 
 Manual (later hardware):
 
@@ -356,8 +369,13 @@ keeps Synesyn optional.
   (ADR 0018); input permissions (ADR 0019); existing `lumur.room` /
   `lumur.event` / `SurfaceGenerator`
 - Architectural decision: ADR 0006–0007, 0009, 0012–0019
-- Implementation tracker: slices 1–2 complete-in-sim (manifest + room fit;
-  input permissions); slices 3–4 remain
-- Executable specification: `companion/tests/test_app_manifest_fit.py`;
-  authoring guide [`docs/apps/manifest.md`](../apps/manifest.md)
+- Implementation tracker: slices 1–4 **complete-in-sim** (manifest + room
+  fit; input permissions; compositor + lifecycle; bundled apps +
+  generation)
+- Executable specification:
+  `companion/tests/test_app_manifest_fit.py`,
+  `test_app_input_permissions.py`,
+  `test_app_compositor_lifecycle.py`,
+  `test_app_bundled_generation.py`;
+  authoring guides under [`docs/apps/`](../apps/)
 - Founding notes: [scratchpad](../scratchpad.md)

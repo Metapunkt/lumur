@@ -13,14 +13,13 @@ only the interactions that matter, and renders continuously. Experiences are
 apps that target named surfaces, so the same app can be installed in another
 room.
 
-**Status:** [PRD-001](docs/product-requirements/PRD-001-CALIBRATE-PAINT-RIPPLE.md)
-and [PRD-002](docs/product-requirements/PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md)
+**Status:** [PRD-001](docs/product-requirements/PRD-001-CALIBRATE-PAINT-RIPPLE.md),
+[PRD-002](docs/product-requirements/PRD-002-SYNESYN-BRIDGE-STORY-STAGE.md),
+and [PRD-003](docs/product-requirements/PRD-003-LUMUR-OS-APPLICATION-LAYER.md)
 are **complete-in-sim** (calibrate → paint → ripples; generation, Synesyn
-bridge, Story Stage, opt-in audience steering / replay — all against the
-sim and mocks). [PRD-003](docs/product-requirements/PRD-003-LUMUR-OS-APPLICATION-LAYER.md)
-is in progress: **slices 1–3 (manifest + room fit; input permissions;
-compositor + lifecycle/launcher) complete-in-sim**; slice 4 covers bundled
-apps + generation.
+bridge, Story Stage, audience steering / replay; app manifest, compositor,
+lifecycle, bundled paint/ripples apps + bridge-only Story Stage + app-side
+generation — all against the sim and mocks).
 Hardware validation is still pending. Founding intent:
 [scratchpad](docs/scratchpad.md),
 [ADRs](docs/architectural-decisions/README.md),
@@ -50,7 +49,9 @@ Session / Story Log replay:
 [`docs/apps/manifest.md`](docs/apps/manifest.md). Input permissions:
 [`docs/apps/input.md`](docs/apps/input.md). Compositor:
 [`docs/apps/compositor.md`](docs/apps/compositor.md). Lifecycle / launcher:
-[`docs/apps/lifecycle.md`](docs/apps/lifecycle.md).
+[`docs/apps/lifecycle.md`](docs/apps/lifecycle.md). Generation from apps:
+[`docs/apps/generation.md`](docs/apps/generation.md). Bundled packages:
+[`apps/`](apps/).
 
 ## Licence
 
