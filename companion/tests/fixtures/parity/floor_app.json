@@ -1,0 +1,20 @@
+{
+  "schema": "lumur.app",
+  "schema_version": "1.0",
+  "id": "parity.floor",
+  "name": "Parity Floor",
+  "version": "0.0.1",
+  "scene": "res://apps/paint/paint_app.tscn",
+  "surfaces": [
+    {
+      "key": "floor",
+      "role": "floor",
+      "min_confidence": 0.05,
+      "required": true
+    }
+  ],
+  "inputs": ["footstep"],
+  "generation": false,
+  "bridge": null,
+  "shares": []
+}

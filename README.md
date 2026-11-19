@@ -34,10 +34,10 @@ Story Stage + steering/replay bridge) and Godot 4 addons
 ## Sim quickstart (no hardware)
 
 Uses one scene (`empty_room`) end to end. Needs `python3-venv` (Debian/Ubuntu:
-`sudo apt install python3-venv`). Godot 4: download from
+`sudo apt install python3-venv`). Godot 4.3: download from
 [godotengine.org](https://godotengine.org/download) and put the binary on
-`PATH` as `godot`, or set `GODOT_BIN`. The tape-measure pixels below are for
-the **64×48 projector / 80×60 camera** sim presets.
+`PATH` as `godot`, or set `GODOT_BIN` / `tools/godot`. The tape-measure pixels
+below are for the **64×48 projector / 80×60 camera** sim presets.
 
 ```bash
 # 1) Companion
@@ -56,17 +56,26 @@ lumur-export-godot ../demo/fixtures/sample_room
 # Or skip capture and use the committed fixture:
 #   demo/fixtures/sample_room/godot/
 
-# 2) Godot (from repo root)
+# 2) Godot (from repo root) — import once so class_name resolves
+#    (fresh checkouts fail GDScript parse until .godot/ exists; ADR 0021)
+cd ..
+export GODOT_BIN="${GODOT_BIN:-godot}"   # or path to Godot 4.3
+bash tools/godot_import.sh               # godot --headless --import
 export LUMUR_GODOT_ASSETS="$PWD/demo/fixtures/sample_room/godot"
 godot --path . demo/scenes/paint_demo.tscn   # or ripple_demo.tscn
 
-# 3) Bundled apps (headless fit check)
-lumur-app check ../apps/paint/lumur.app.json
-lumur-app fit ../apps/paint/lumur.app.json --room ../demo/fixtures/sample_room
-lumur-app fit ../apps/ripples/lumur.app.json --room ../demo/fixtures/sample_room
+# 3) Bundled apps (headless check / fit / list / run)
+lumur-app check apps/paint/lumur.app.json
+lumur-app fit apps/paint/lumur.app.json --room demo/fixtures/sample_room
+lumur-app fit apps/ripples/lumur.app.json --room demo/fixtures/sample_room
+lumur-app list
+lumur-app run apps/paint/lumur.app.json --room demo/fixtures/sample_room
+# Umbrella equivalents: lumur app check|fit|list|run …
 ```
 
 Keep calibrate and scan on the **same** `--scene`. A mismatch prints a warning.
+Mistyped `--scene` names list the known sim presets; missing cameras suggest
+`--backend sim --scene empty_room`.
 
 ## Documentation
 

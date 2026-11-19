@@ -40,10 +40,10 @@ jobs:
             echo "::endgroup::"
           done
 
-      - name: Console-script smoke (three presets)
+      - name: Console-script smoke (four presets + lumur-app)
         run: |
           set -euo pipefail
-          for scene in empty_room room_with_box noisy_room; do
+          for scene in empty_room room_with_box noisy_room room_with_walkers; do
             echo "::group::smoke $scene"
             work=$(mktemp -d)
             lumur-calibrate --backend sim --scene "$scene" \
@@ -53,21 +53,70 @@ jobs:
               --calibration "$work/cal.json" -o "$work/room"
             lumur-export-godot "$work/room"
             test -f "$work/room/godot/paint_manifest.json"
+            lumur-app check ../apps/paint/lumur.app.json
+            lumur-app fit ../apps/paint/lumur.app.json --room "$work/room"
+            lumur-app list >/dev/null
+            lumur-app run ../apps/paint/lumur.app.json --room "$work/room"
+            lumur app check ../apps/paint/lumur.app.json
             echo "::endgroup::"
           done
 
   godot:
-    name: Godot headless (optional)
+    name: Godot 4.3 headless
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 
-      - name: Skip unless GODOT_BIN provided
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python companion + xvfb
         run: |
-          if [ -z "${{ vars.GODOT_BIN || '' }}" ] && [ -z "${GODOT_BIN:-}" ]; then
-            echo "Godot headless tests skipped (no GODOT_BIN / tools/godot in CI)."
-            echo "Run locally: GODOT_BIN=/path/to/godot pytest companion/tests/test_paint.py -k godot"
-            exit 0
-          fi
-          echo "GODOT_BIN is set but this workflow does not download Godot yet; skipped."
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb unzip
+          python -m pip install --upgrade pip
+          pip install -e "./companion[dev]"
+
+      - name: Download Godot 4.3 headless
+        run: |
+          set -euo pipefail
+          mkdir -p tools
+          curl -fsSL -o /tmp/godot.zip \
+            "https://github.com/godotengine/godot-builds/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip"
+          unzip -qo /tmp/godot.zip -d /tmp/godot_extract
+          GODOT_BIN="$(find /tmp/godot_extract -type f -name 'Godot*' | head -n1)"
+          install -m 755 "$GODOT_BIN" tools/godot
+          echo "GODOT_BIN=$PWD/tools/godot" >> "$GITHUB_ENV"
+          tools/godot --version
+
+      - name: Import project (class cache)
+        run: |
+          set -euo pipefail
+          export GODOT_BIN="$PWD/tools/godot"
+          bash tools/godot_import.sh
+          test -d .godot
+
+      - name: Load paint + ripples demos
+        run: |
+          set -euo pipefail
+          export GODOT_BIN="$PWD/tools/godot"
+          export LUMUR_GODOT_ASSETS="$PWD/demo/fixtures/sample_room/godot"
+          # Use xvfb so gl_compatibility actually draws (pure --headless is dummy).
+          xvfb-run -a "$GODOT_BIN" --path . --display-driver x11 \
+            --rendering-driver opengl3 \
+            --script res://demo/scripts/headless_paint_render.gd \
+            -- --assets="$LUMUR_GODOT_ASSETS" --out=/tmp/ci_paint.png
+          test -f /tmp/ci_paint.png
+          xvfb-run -a "$GODOT_BIN" --path . --display-driver x11 \
+            --rendering-driver opengl3 \
+            --script res://demo/scripts/headless_ripple_render.gd \
+            -- --assets="$LUMUR_GODOT_ASSETS" --out=/tmp/ci_ripple.png
+          test -f /tmp/ci_ripple.png
+
+      - name: Godot-marked pytest
+        run: |
+          set -euo pipefail
+          export GODOT_BIN="$PWD/tools/godot"
+          cd companion
+          pytest -k godot
